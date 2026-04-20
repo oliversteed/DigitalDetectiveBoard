@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+
+<head>
+    <title>Test Website</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<html>
+<body>
+    <script src="node_modules/interactjs/dist/interact.js"></script>
+    <script src="code.js"></script>
+
+    <div class="sideBar">
+        <a class="sideButton" onclick="createNote()" tabindex="0">Create note</a>
+        <div class="sideButton">
+            <a onclick="toggleInertia()" tabindex="0">Inertia</a>
+            <div id="inertiaButton"></div>
+        </div>
+        <div class="sideButton">
+            <a onclick="toggleCorkboardInertia()" tabindex="0">Board Inertia</a>
+            <div id="inertiaCorkboardButton"></div>
+        </div>
+        <div class="sideButton">
+            <a onclick="toggleCut()" tabindex="0">Cut strings</a>
+            <div id="cutButton"></div>
+        </div>
+    </div>
+    <div id="viewport">
+        <div id="corkboard" class="corkdrag">
+            <svg id="string"></svg>
+        </div>
+    </div>
+    <dialog id="modalOverlay" class="hidden">
+        <span id="editNoteBox" role="dialog" aria-label="Edit note window" aria-modal="true">
+            <div class="modalTextSection">
+                <label class="modalTextLabel" for="modalTextInput">Edit Note Text</label>
+                <textarea id="modalTextInput"></textarea>
+            </div>
+            <div class="modalColourSection">
+                <label class="modalColourSelectorLabel" for="modalColourSelector">Select Note Colour</label>
+                <div class="modalColourPicker" id="modalColourSelector"></div>
+            </div>
+            <div>
+                <button id="cancelNoteEditButton" onclick="cancelEditNote()">Cancel</button>
+                <button id="applyNoteEditButton" onclick="applyEditNote()">Apply</button>
+            </div>
+        </span>
+    </dialog>
+</body>
+</html>

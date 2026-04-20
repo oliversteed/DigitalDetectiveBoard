@@ -1,0 +1,282 @@
+.note{
+    background-color: rgb(255, 242, 0);
+    color: rgb(0, 0, 0);
+    touch-action: none;
+    user-select: none;
+    text-align: center;
+    font-size: large;
+    border-radius: 20px;
+    box-sizing: border-box;
+    width: 200px;
+    height: 180px;
+    position: absolute;
+    user-select: none;
+    border-color: black;
+    border-width: 3px;
+    border-style: solid;
+    overflow: visible;
+    padding: 5px;
+}
+
+.draggable:focus{
+    background-color: rgb(235, 223, 0);
+}
+
+.text-clipping{
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.sideBar{
+    width: 150px;
+    flex-shrink: 0;
+    background-color: aliceblue;
+}
+
+.sideButton{
+    display: block;
+    overflow: auto;
+    padding: 10px;
+    margin: 0;
+    cursor: pointer;
+    user-select: none;
+}
+
+.sideButton:hover{
+    background-color: antiquewhite;
+}
+
+.deleteButton{
+    border-radius: 50%;
+    position: absolute;
+    top: -20px;
+    left: 20px;
+    border-color: black;
+    border-width: 3px;
+    border-style: solid;
+    padding: 0;
+    background-color: red;
+
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+
+    width: 30px !important;
+    height: 30px !important;
+    transform: scale(1) !important;
+    flex: none !important;
+}
+
+.editButton{
+    border-radius: 50%;
+    position: absolute;
+    top: -20px;
+    left: 50px;
+    border-color: black;
+    border-width: 3px;
+    border-style: solid;
+    padding: 0;
+    background-color: orange;
+
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+
+    width: 30px !important;
+    height: 30px !important;
+    transform: scale(1) !important;
+    flex: none !important;
+}
+
+.connectButton{
+    border-radius: 50%;
+    position: absolute;
+    top: -20px;
+    left: 80px;
+    border-color: black;
+    border-width: 3px;
+    border-style: solid;
+    padding: 0;
+
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+
+    width: 30px !important;
+    height: 30px !important;
+    transform: scale(1) !important;
+    flex: none !important;
+}
+
+/* Change styles when mouse hover or keyboard focus is within the note/buttons */
+.draggable:hover .deleteButton,
+.draggable:focus-within .deleteButton{
+    opacity: 1;
+}
+
+.deleteButton:hover,
+.deleteButton:focus-within{
+    background-color: rgb(190, 0, 0);
+}
+
+.draggable:hover .editButton,
+.draggable:focus-within .editButton{
+    opacity: 1;
+}
+
+.editButton:hover,
+.editButton:focus-within{
+    background-color: rgb(190, 123, 0);
+}
+
+.draggable:hover .connectButton,
+.draggable:focus-within .connectButton{
+    opacity: 1;
+}
+
+/* for initially hidden content */
+.hidden{
+    display: none !important; /* Important ensures modal's display attribute values don't overwrite this */
+}
+
+.string{
+    stroke: darkred;
+    stroke-width: 3;
+    stroke-linecap: round;
+}
+
+.cutLine{
+    stroke: darkred;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-dasharray: 5px;
+}
+
+.corkdrag.dragging,
+.corkdrag.dragging * {
+    cursor: crosshair !important;
+}
+
+#corkboard{
+    position: relative;
+    height: 5000px;
+    width: 5000px;
+    background-color: beige;
+    flex-grow: 1;
+    border-style: solid;
+    border-width: 5px;
+    border-color: brown;
+
+    touch-action: none;
+
+    background-image: conic-gradient(rgba(0, 0, 0, 0.04) 25%, transparent 25% 50%, rgba(0, 0, 0, 0.04) 50% 75%, transparent 75%);
+    background-size: 15px 15px;
+    background-attachment: local;
+}
+
+#inertiaButton{
+    background-color: rgb(0, 202, 0);
+    display: inline-block;
+    vertical-align: middle;
+    width: 20px;
+    height: 20px;
+}
+
+#inertiaCorkboardButton{
+    background-color: red;
+    display: inline-block;
+    vertical-align: middle;
+    width: 20px;
+    height: 20px;
+}
+
+#cutButton{
+    background-color: red;
+    display: inline-block;
+    vertical-align: middle;
+    width: 20px;
+    height: 20px;
+}
+
+#example{
+    left: 400px;
+}
+
+#example2{
+    left: 650px;
+}
+
+/* Modal backdrop colour */
+#modalOverlay{
+    background-color: rgba(0, 0, 0, 0.5);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#editNoteBox{
+    background-color: rgb(255, 252, 190);
+    color: rgb(0, 0, 0);
+    text-align: center;
+    font-size: large;
+    border-radius: 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 30vw;
+    aspect-ratio: 1/1;
+    border-color: black;
+    border-width: 3px;
+    border-style: solid;
+    overflow: visible;
+    padding: 5px;
+}
+
+#modalTextInput{
+    width: 90%;
+    height: 90%;
+    resize: none;
+    margin: 10px;
+    border: 2px solid black;
+    border-radius: 8px;
+}
+
+#viewport{
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+}
+
+#string{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 5000px;
+    height: 5000px;
+    pointer-events: none;
+    z-index: 0;
+    transform-origin: 0 0;
+}
+
+/* Built in resizing for text-area is disabled as it only works from the bottom right corner. We handle resizing and dragging simultaneously using interact.js */
+textarea{
+    resize: none;
+}
+
+html, body{
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+}
+
+body{
+    display: flex;
+    font-family: Arial, Helvetica, sans-serif;
+}
