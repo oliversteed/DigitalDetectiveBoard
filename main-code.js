@@ -1,3 +1,6 @@
+//Import other JS files
+import {checkIntersection} from "./maths.js";
+
 //global variables
 var inertiaToggle = true;
 var corkboardInertiaToggle = false;
@@ -11,10 +14,26 @@ let corkboard;
 let stringLayer;
 
 document.addEventListener('DOMContentLoaded', () =>{ //Wait for DOM to finish loading before retrieving global variables with DOM objects assigned to them
-    editOverlay = document.getElementById('modalOverlay'); //Retrieve the edit note overlay
-    corkboard = document.getElementById("corkboard"); //Retrieves the corkboard base
+    //retrieve and store necessary elements to add listeners to
+    editOverlay = document.getElementById('modalOverlay');
+    corkboard = document.getElementById("corkboard");
     stringLayer = document.getElementById('string');
+    const createNoteButton = document.getElementById('createNoteButton');
+    const inertiaButton = document.getElementById('inertiaButtonID');
+    const cutButton = document.getElementById('cutButtonID');
+    const cancelEditButton = document.getElementById('cancelNoteEditButton');
+    const applyEditButton = document.getElementById('applyNoteEditButton');
     let cutLine = null;
+
+    //Ensure Interact listeners are set after DOM has fully loaded
+    setInteractListeners();
+
+    //Add event listeners for the side buttons
+    createNoteButton.addEventListener('click', createNote);
+    inertiaButton.addEventListener('click', toggleInertia);
+    cutButton.addEventListener('click', toggleCut);
+    cancelEditButton.addEventListener('click', cancelEditNote);
+    applyEditButton.addEventListener('click', applyEditNote);
 
     //Add the mousedown event listener to the corkboard to manage cut string logic
     corkboard.addEventListener('mousedown', (event) => {
@@ -78,48 +97,50 @@ document.addEventListener('DOMContentLoaded', () =>{ //Wait for DOM to finish lo
     createNote("Welcome to this website!")
 })
 
-//Interact.js logic for dragging and resizing notes
-interact('.draggable').resizable({
-    //Allows resizing from all edges and corners
-    edges: {left: true, right: true, bottom: true, top: true},
+function setInteractListeners(){
+    //Interact.js logic for dragging and resizing notes
+    interact('.draggable').resizable({
+        //Allows resizing from all edges and corners
+        edges: {left: true, right: true, bottom: true, top: true},
 
-    listeners: {move: window.resizeListener},
-    inertia: false,
-    autoScroll: false
-})
-.draggable({
-    listeners: {move: window.dragMoveListener},
-    inertia: inertiaToggle,
-    autoScroll: false,
-    modifiers: [
-        interact.modifiers.restrictRect({
-            restriction: 'parent',
-            endOnly: false
-        })
-    ]
-})
+        listeners: {move: resizeListener},
+        inertia: false,
+        autoScroll: false
+    })
+    .draggable({
+        listeners: {move: dragMoveListener},
+        inertia: inertiaToggle,
+        autoScroll: false,
+        modifiers: [
+            interact.modifiers.restrictRect({
+                restriction: 'parent',
+                endOnly: false
+            })
+        ]
+    })
 
-//Interact.js logic for dragging the corkboard itself
-interact('.corkdrag').resizable({
-    //Does not allow resizing of the corkboard
-    edges: {left: false, right: false, bottom: false, top: false},
+    //Interact.js logic for dragging the corkboard itself
+    interact('.corkdrag').resizable({
+        //Does not allow resizing of the corkboard
+        edges: {left: false, right: false, bottom: false, top: false},
 
-    listeners: {move: window.resizeListener},
-    inertia: false,
-    autoScroll: false,
-})
-.draggable({
-    listeners: {move: window.dragMoveListener},
-    inertia: corkboardInertiaToggle,
-    autoScroll: false,
-    modifiers: [
-        interact.modifiers.restrictRect({
-            restriction: 'parent',
-            endOnly: false,
-            //elementRect: {left: 1, right: 0, top: 1, bottom: 0}
-        })
-    ]
-})
+        listeners: {move: resizeListener},
+        inertia: false,
+        autoScroll: false,
+    })
+    .draggable({
+        listeners: {move: dragMoveListener},
+        inertia: corkboardInertiaToggle,
+        autoScroll: false,
+        modifiers: [
+            interact.modifiers.restrictRect({
+                restriction: 'parent',
+                endOnly: false,
+                //elementRect: {left: 1, right: 0, top: 1, bottom: 0}
+            })
+        ]
+    })
+}
 
 //Logic for updating position of element when dragging
 function dragMoveListener(event){
@@ -225,6 +246,9 @@ function createNote(defaultText){
 
     newNote.append(noteText);
 
+    //Set parameter to null if it was just an eventCode passed
+    if(defaultText instanceof Event) defaultText = null;
+
     if(defaultText != null){ //Sets the text content of the note only if text was passed to the function. This is primarily for notes created on load as welcome messages.
         noteText.textContent = defaultText;
     }
@@ -277,10 +301,9 @@ function createNote(defaultText){
 
     //Logic for the delete note button
     deleteButton.setAttribute('class', 'deleteButton');
-    deleteButton.onclick = function(event){
-        event.stopPropagation();
+    deleteButton.addEventListener('click', event => {
         deleteNoteButton(newNote);
-    }
+    });
 
     //Make the buttons children of the parent note
     newNote.appendChild(deleteButton);
@@ -415,7 +438,7 @@ function deleteNoteButton(note){
 }
 
 function removeAttachedStrings(note){
-    itemID = note.id;
+    const itemID = note.id;
 
     //Find all strings that start with the deleted note and delete them
     document.querySelectorAll(`[data-noteStart="${itemID}"]`).forEach(string => {
@@ -426,36 +449,4 @@ function removeAttachedStrings(note){
     document.querySelectorAll(`[data-noteEnd="${itemID}"]`).forEach(string => {
         string.remove();
     });
-}
-
-//Checks whether 2 line segments intersect. Accepts the coordinates of the start and end points of both lines as parameters, returns true or false. Utilises the mathematical formula for line segment intersection.
-function checkIntersection(x1, y1, x2, y2, x3, y3, x4, y4){
-    
-    //First calculate the denominator.
-    const d = (y4 - y3) * (x2 - x1) - (y2 - y1) * (x4 - x3);
-
-    //If the denominator is 0, the lines are parallel and therefore cannot intersect. Return early to prevent a divide by 0 error later in the calculation.
-    if(d == 0){
-        return false;
-    }
-
-    //Calculate the first numerator.
-    const n1 = ((x4 - x3) * (y1 - y3) - ((y4 - y3) * (x1 - x3)));
-    //Calculate the second numerator
-    const n2 = ((x2 - x1) * (y1 - y3) - ((y2 - y1) * (x1 - x3)));
-
-    //Solve for intersection position on line 1
-    const pos1 = n1/d;
-
-    //Solve for intersection position on line 2
-    const pos2 = n2/d
-
-    //The lines only intersect if both values fall within 0-1. Return true in this case.
-    if((0 <= pos1) && (pos1 <= 1) && (0 <= pos2) && (pos2 <= 1)){
-        return true
-    }
-
-    //If the lines do not intersect, return false.
-    return false;
-
 }
