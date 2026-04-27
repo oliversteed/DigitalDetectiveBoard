@@ -1,3 +1,5 @@
+//Maths functions
+
 //Checks whether 2 line segments intersect. Accepts the coordinates of the start and end points of both lines as parameters, returns true or false. Utilises the mathematical formula for line segment intersection.
 export function checkIntersection(x1, y1, x2, y2, x3, y3, x4, y4){
     
@@ -28,4 +30,29 @@ export function checkIntersection(x1, y1, x2, y2, x3, y3, x4, y4){
     //If the lines do not intersect, return false.
     return false;
 
+}
+
+//Get X position of passed event
+export function getDataX(event){
+    return (parseFloat(event.target.getAttribute('data-x')) || 0);
+}
+
+//Get Y position of passed event
+export function getDataY(event){
+    return (parseFloat(event.target.getAttribute('data-y')) || 0);
+}
+
+//These 2 functions return the offset number relative to the corkboard and the viewport for positioning maths.
+export function calculateOffsetX(stateVars){
+    const corkRect = corkboard.getBoundingClientRect();
+    const corkX = corkRect.x || 0;
+    //returns corkboard X coord - the width of the viewport.
+    return (window.innerWidth/2) - corkX;
+}
+
+export function calculateOffsetY(stateVars){
+    const corkRect = corkboard.getBoundingClientRect();
+    const corkY = corkRect.y || 0;
+    //returns corkboard X coord - the width of the viewport.
+    return (window.innerHeight/2) - corkY;
 }
