@@ -7,21 +7,17 @@
 
 <html>
 <body>
-    <script src="node_modules/interactjs/dist/interact.js"></script>
-    <script src="code.js"></script>
+    <script src="interactjsFiles/interact.js"></script>
+    <script type="module" src="main-code.js"></script>
 
     <div class="sideBar">
-        <a class="sideButton" onclick="createNote()" tabindex="0">Create note</a>
+        <a class="sideButton" id="createNoteButton" tabindex="0">Create note</a>
         <div class="sideButton">
-            <a onclick="toggleInertia()" tabindex="0">Inertia</a>
+            <a id="inertiaButtonID" tabindex="0">Inertia</a>
             <div id="inertiaButton"></div>
         </div>
         <div class="sideButton">
-            <a onclick="toggleCorkboardInertia()" tabindex="0">Board Inertia</a>
-            <div id="inertiaCorkboardButton"></div>
-        </div>
-        <div class="sideButton">
-            <a onclick="toggleCut()" tabindex="0">Cut strings</a>
+            <a id="cutButtonID" tabindex="0">Cut strings</a>
             <div id="cutButton"></div>
         </div>
     </div>
@@ -41,8 +37,8 @@
                 <div class="modalColourPicker" id="modalColourSelector"></div>
             </div>
             <div>
-                <button id="cancelNoteEditButton" onclick="cancelEditNote()">Cancel</button>
-                <button id="applyNoteEditButton" onclick="applyEditNote()">Apply</button>
+                <button id="cancelNoteEditButton">Cancel</button>
+                <button id="applyNoteEditButton">Apply</button>
             </div>
         </span>
     </dialog>
