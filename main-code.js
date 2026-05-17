@@ -3,6 +3,7 @@ import {checkIntersection, getDataX, getDataY, calculateOffsetX, calculateOffset
 import { makeString, updateStrings, removeAttachedStrings } from "./strings.js";
 import { toggleCut, toggleInertia } from "./toggles.js";
 import { createNote, cancelEditNote, applyEditNote } from "./noteHandling.js";
+import { zoomHandler } from "./zoom.js";
 
 //Module-scoped variables stored in an object to easily pass to functions. These store major persistent DOM objects that many functions need to access, or store states that are tracked and modified for the corkboard functionality.
 const stateVars = {
@@ -14,16 +15,20 @@ const stateVars = {
     itemIDTracker: 1,
     editOverlay: null,
     corkboard: null,
+    zoomSpace: null,
     stringLayer: null,
-    cutLine: null
+    cutLine: null,
+    zoomLevel: 1
 }
 
 //Wait for DOM to finish loading then initialise the major elements and add their event listeners
 document.addEventListener('DOMContentLoaded', () =>{
     //retrieve and store necessary elements to add listeners to
     stateVars.editOverlay = document.getElementById('modalOverlay');
-    stateVars.corkboard = document.getElementById("corkboard");
+    stateVars.corkboard = document.getElementById('corkboard');
     stateVars.stringLayer = document.getElementById('string');
+    stateVars.zoomSpace = document.getElementById('zoomSpace');
+
     const createNoteButton = document.getElementById('createNoteButton');
     const inertiaButton = document.getElementById('inertiaButtonID');
     const cutButton = document.getElementById('cutButtonID');
@@ -40,13 +45,22 @@ document.addEventListener('DOMContentLoaded', () =>{
     cancelEditButton.addEventListener('click', () => cancelEditNote(stateVars));
     applyEditButton.addEventListener('click', () => applyEditNote(stateVars));
 
+    //Event listener for zooming in/out on the corkboard
+    stateVars.zoomSpace.addEventListener('wheel', (event) => {
+        if(event.ctrlKey){
+            //Prevent browser's default zoom
+            event.preventDefault();
+            zoomHandler(event, stateVars);
+        }
+    });
+
     //Add the mousedown event listener to the corkboard to manage cut string logic
     stateVars.corkboard.addEventListener('mousedown', (event) => {
         if(stateVars.cutToggle == false) return;
 
         //get coordinates of where the mouse click occured.
-        const mousePosX = event.clientX - corkboard.getBoundingClientRect().left;
-        const mousePosY = event.clientY - corkboard.getBoundingClientRect().top;
+        const mousePosX = (event.clientX - stateVars.corkboard.getBoundingClientRect().left)/stateVars.zoomLevel;
+        const mousePosY = (event.clientY - stateVars.corkboard.getBoundingClientRect().top)/stateVars.zoomLevel;
 
         //Create a new line with the same start and end point initially
         stateVars.cutLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
@@ -66,8 +80,8 @@ document.addEventListener('DOMContentLoaded', () =>{
         if(stateVars.cutLine == null) return;
 
         //Get new mouse coordinates as the mouse is moved
-        const mousePosX = event.clientX - stateVars.corkboard.getBoundingClientRect().left;
-        const mousePosY = event.clientY - stateVars.corkboard.getBoundingClientRect().top;
+        const mousePosX = (event.clientX - stateVars.corkboard.getBoundingClientRect().left)/stateVars.zoomLevel;
+        const mousePosY = (event.clientY - stateVars.corkboard.getBoundingClientRect().top)/stateVars.zoomLevel;
 
         //Set new coordinates for the end of the line, moving it with the mouse.
         stateVars.cutLine.setAttribute('x2', mousePosX);
@@ -137,14 +151,7 @@ function setInteractListeners(){
     .draggable({
         listeners: {move: dragMoveListener},
         inertia: false,
-        autoScroll: false,
-        modifiers: [
-            interact.modifiers.restrictRect({
-                restriction: 'parent',
-                endOnly: false,
-                //elementRect: {left: 1, right: 0, top: 1, bottom: 0}
-            })
-        ]
+        autoScroll: false
     })
 }
 
@@ -153,8 +160,8 @@ function dragMoveListener(event){
     //Do not move if the user is currently using the cut string tool
     if(stateVars.cutToggle) return;
 
-    var x = getDataX(event) + event.dx;
-    var y = getDataY(event) + event.dy;
+    var x = getDataX(event) + (event.dx/stateVars.zoomLevel);
+    var y = getDataY(event) + (event.dy/stateVars.zoomLevel);
 
     event.target.style.transform = `translate(${x}px, ${y}px)`;
 
@@ -173,8 +180,8 @@ function resizeListener(event){
     var x = getDataX(event);
     var y = getDataY(event);
 
-    event.target.style.width = event.rect.width + 'px'; //Width
-    event.target.style.height = event.rect.height + 'px'; //Height
+    event.target.style.width = (event.rect.width/stateVars.zoomLevel) + 'px'; //Width
+    event.target.style.height = (event.rect.height/stateVars.zoomLevel) + 'px'; //Height
 
     x += event.deltaRect.left;
     y += event.deltaRect.top;

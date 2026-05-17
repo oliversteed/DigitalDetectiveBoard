@@ -265,6 +265,12 @@
     transform-origin: 0 0;
 }
 
+#zoomSpace{
+    transform-origin: 0 0;
+    width: 100%;
+    height: 100%;
+}
+
 /* Built in resizing for text-area is disabled as it only works from the bottom right corner. We handle resizing and dragging simultaneously using interact.js */
 textarea{
     resize: none;
