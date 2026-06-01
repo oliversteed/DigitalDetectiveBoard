@@ -6,9 +6,6 @@ import { getDataX, getDataY, calculateOffsetX, calculateOffsetY, checkIntersecti
 export function createNote(defaultText, stateVars){
     const newNote = document.createElement("div"); //Creates the base note div
     const noteText = document.createElement("p"); //Creates a text container
-    const deleteButton = document.createElement("button"); //Creates the delete button
-    const editButton = document.createElement("button"); //Creates the edit button
-    const connectButton = document.createElement("button"); //Creates the button to connect with "string"
 
     newNote.append(noteText);
 
@@ -19,68 +16,9 @@ export function createNote(defaultText, stateVars){
         noteText.textContent = defaultText;
     }
 
-    editButton.setAttribute('class', 'editButton'); //Give editButton the appropriate class
-    editButton.onclick = function(event){ //The logic for the notes' edit buttons
-        event.stopPropagation(); //Prevents the draggable functionality from stopping the click button being registered
-        
-        stateVars.currentEditedNote = newNote;
-        document.getElementById('modalTextInput').value = newNote.textContent;
-
-        //Opens the edit modal overlay and passes the relevant note
-        openEditModal(newNote, stateVars);
-
-        //Unhides the overlay
-        stateVars.editOverlay.classList.remove("hidden");
-
-        //moves focus to the overlay for accessibility purposes
-        document.getElementById('modalTextInput').focus();
-    }
-
-    connectButton.setAttribute('class', 'connectButton');
-    connectButton.onclick = function(event){
-
-        //If this note is already stored as the start connection, don't do anything, otherwise it would connect to itself.
-        if(stateVars.connectStart == newNote){
-            return;
-        }
-
-        //If connectStart is null, store the note in that variable.
-        if(stateVars.connectStart == null){
-            stateVars.connectStart = newNote;
-        }
-    }
-
-    //Handles whether clicks on the note are to connect notes or not.
-    newNote.onclick = function(event){
-        //If the connect function has not been initiated (no note stored in the connectStart variable) then don't do anything.
-        if(stateVars.connectStart == null){
-            return;
-        }
-        //If this note is already stored as the start connection, don't do anything, otherwise it would connect to itself.
-        if(stateVars.connectStart == newNote){
-            return;
-        }
-
-        stateVars.connectEnd = newNote;
-        makeString(stateVars);
-    }
-
-    //Logic for the delete note button
-    deleteButton.setAttribute('class', 'deleteButton');
-    deleteButton.addEventListener('click', event => {
-        deleteNote(newNote);
-    });
-
-    newNote.addEventListener('keydown', event => {
-        if(event.code == "Delete"){
-            deleteNote(newNote);
-        }
-    });
-
-    //Make the buttons children of the parent note
-    newNote.appendChild(deleteButton);
-    newNote.appendChild(editButton);
-    newNote.appendChild(connectButton);
+    appendDeleteButton(newNote);
+    appendEditButton(newNote, stateVars);
+    appendConnectButton(newNote, stateVars);
 
     //Set note HTML attributes
     newNote.setAttribute('class', 'draggable note'); //set note to have draggable and note classes
@@ -107,9 +45,92 @@ export function createNote(defaultText, stateVars){
     stateVars.corkboard.appendChild(newNote);
 }
 
+//Initiates image upload
+export function uploadImage(stateVars){
+    
+}
+
+//Creates and appends a delete button to the passed item.
 function appendDeleteButton(item){
+    const deleteButton = document.createElement("button"); //Creates the delete button
 
+    //Logic for the delete note button
+    deleteButton.setAttribute('class', 'deleteButton');
+    deleteButton.addEventListener('click', event => {
+        deleteNote(item);
+    });
 
+    //Add event listener to allow use of DEL key
+    item.addEventListener('keydown', event => {
+        if(event.code == "Delete"){
+            deleteNote(item);
+        }
+    });
+
+    //append button
+    item.appendChild(deleteButton);
+}
+
+//Creates and appends an edit button to the passed item.
+function appendEditButton(item, stateVars){
+    const editButton = document.createElement("button"); //Creates the edit button
+
+    editButton.setAttribute('class', 'editButton'); //Give editButton the appropriate class
+    editButton.onclick = function(event){ //The logic for the notes' edit buttons
+        event.stopPropagation(); //Prevents the draggable functionality from stopping the click button being registered
+        
+        stateVars.currentEditedNote = item;
+        document.getElementById('modalTextInput').value = item.textContent;
+
+        //Opens the edit modal overlay and passes the relevant note
+        openEditModal(item, stateVars);
+
+        //Unhides the overlay
+        stateVars.editOverlay.classList.remove("hidden");
+
+        //moves focus to the overlay for accessibility purposes
+        document.getElementById('modalTextInput').focus();
+    }
+
+    //append button
+    item.appendChild(editButton);
+}
+
+//Creates and appends a connect button to the passed item.
+function appendConnectButton(item, stateVars){
+    const connectButton = document.createElement("button"); //Creates the button to connect with "string"
+
+    connectButton.setAttribute('class', 'connectButton');
+    connectButton.onclick = function(event){
+
+        //If this note is already stored as the start connection, don't do anything, otherwise it would connect to itself.
+        if(stateVars.connectStart == item){
+            return;
+        }
+
+        //If connectStart is null, store the note in that variable.
+        if(stateVars.connectStart == null){
+            stateVars.connectStart = item;
+        }
+    }
+
+    //Handles whether clicks on the note are to connect notes or not.
+    item.onclick = function(event){
+        //If the connect function has not been initiated (no note stored in the connectStart variable) then don't do anything.
+        if(stateVars.connectStart == null){
+            return;
+        }
+        //If this note is already stored as the start connection, don't do anything, otherwise it would connect to itself.
+        if(stateVars.connectStart == item){
+            return;
+        }
+
+        stateVars.connectEnd = item;
+        makeString(stateVars);
+    }
+
+    //Append button
+    item.appendChild(connectButton);
 }
 
 //This function opens the modal for editing a note. It calls the showModal function and then sets the currently edited note global variable to the passed note.

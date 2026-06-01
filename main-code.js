@@ -2,7 +2,7 @@
 import {checkIntersection, getDataX, getDataY, calculateOffsetX, calculateOffsetY} from "./maths.js";
 import { makeString, updateStrings, removeAttachedStrings } from "./strings.js";
 import { toggleCut, toggleInertia } from "./toggles.js";
-import { createNote, cancelEditNote, applyEditNote } from "./itemHandling.js";
+import { createNote, cancelEditNote, applyEditNote, uploadImage } from "./itemHandling.js";
 import { zoomHandler } from "./zoom.js";
 
 //Module-scoped variables stored in an object to easily pass to functions. These store major persistent DOM objects that many functions need to access, or store states that are tracked and modified for the corkboard functionality.
@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () =>{
 
     //Add event listeners for the side buttons
     createNoteButton.addEventListener('click', () => createNote(null, stateVars));
-    uploadImageButton.addEventListener('click', () => uploadImageButton(stateVars));
+    uploadImageButton.addEventListener('click', () => uploadImage(stateVars));
     inertiaButton.addEventListener('click', () => toggleInertia(stateVars));
     cutButton.addEventListener('click', () => toggleCut(stateVars));
     cancelEditButton.addEventListener('click', () => cancelEditNote(stateVars));
