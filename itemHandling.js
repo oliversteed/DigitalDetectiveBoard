@@ -16,6 +16,7 @@ export function createNote(defaultText, stateVars){
         noteText.textContent = defaultText;
     }
 
+    //Create and add all relevant buttons
     appendDeleteButton(newNote);
     appendEditButton(newNote, stateVars);
     appendConnectButton(newNote, stateVars);
@@ -46,8 +47,25 @@ export function createNote(defaultText, stateVars){
 }
 
 //Initiates image upload
-export function uploadImage(stateVars){
-    
+export function uploadImage(event, stateVars){
+    //Set selected uploaded image
+    const image = event.target.files[0];
+
+    //If there is no image (userr cancelled operation) return and do nothing.
+    if(!image) return;
+
+    const reader = new FileReader();
+
+    //Once loaded, retrieve the images Base64 string.
+    reader.onload = function(e) {
+        const imageBase64 = e.target.result;
+
+        //For now, display Base64 in the terminal
+        console.log(imageBase64);
+    }
+
+    //Initiate reading image from the provided path
+    reader.readAsDataURL(image);
 }
 
 //Creates and appends a delete button to the passed item.

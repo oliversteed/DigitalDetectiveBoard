@@ -41,11 +41,14 @@ document.addEventListener('DOMContentLoaded', () =>{
 
     //Add event listeners for the side buttons
     createNoteButton.addEventListener('click', () => createNote(null, stateVars));
-    uploadImageButton.addEventListener('click', () => uploadImage(stateVars));
+    uploadImageButton.addEventListener('click', () => document.getElementById("uploadedImage").click());
     inertiaButton.addEventListener('click', () => toggleInertia(stateVars));
     cutButton.addEventListener('click', () => toggleCut(stateVars));
     cancelEditButton.addEventListener('click', () => cancelEditNote(stateVars));
     applyEditButton.addEventListener('click', () => applyEditNote(stateVars));
+
+    //Add event listener to the hidden image input to check when a new images is being uploaded
+    document.getElementById("uploadedImage").addEventListener('change', () => uploadImage(event, stateVars));
 
     //Event listener for zooming in/out on the corkboard
     stateVars.zoomSpace.addEventListener('wheel', (event) => {
