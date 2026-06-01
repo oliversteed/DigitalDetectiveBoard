@@ -107,6 +107,11 @@ export function createNote(defaultText, stateVars){
     stateVars.corkboard.appendChild(newNote);
 }
 
+function appendDeleteButton(item){
+
+
+}
+
 //This function opens the modal for editing a note. It calls the showModal function and then sets the currently edited note global variable to the passed note.
 export function openEditModal(note, stateVars){
     stateVars.editOverlay.showModal();
@@ -129,7 +134,7 @@ export function applyEditNote(stateVars){
 }
 
 //Delete a note using the note's appended delete button. Does not need an event passed
-function deleteNote(note){
-    removeAttachedStrings(note);
-    note.remove();
+function deleteNote(item){
+    removeAttachedStrings(item);
+    item.remove();
 }

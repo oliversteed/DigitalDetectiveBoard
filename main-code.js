@@ -2,7 +2,7 @@
 import {checkIntersection, getDataX, getDataY, calculateOffsetX, calculateOffsetY} from "./maths.js";
 import { makeString, updateStrings, removeAttachedStrings } from "./strings.js";
 import { toggleCut, toggleInertia } from "./toggles.js";
-import { createNote, cancelEditNote, applyEditNote } from "./noteHandling.js";
+import { createNote, cancelEditNote, applyEditNote } from "./itemHandling.js";
 import { zoomHandler } from "./zoom.js";
 
 //Module-scoped variables stored in an object to easily pass to functions. These store major persistent DOM objects that many functions need to access, or store states that are tracked and modified for the corkboard functionality.
@@ -30,6 +30,7 @@ document.addEventListener('DOMContentLoaded', () =>{
     stateVars.zoomSpace = document.getElementById('zoomSpace');
 
     const createNoteButton = document.getElementById('createNoteButton');
+    const uploadImageButton = document.getElementById('uploadImageButton');
     const inertiaButton = document.getElementById('inertiaButtonID');
     const cutButton = document.getElementById('cutButtonID');
     const cancelEditButton = document.getElementById('cancelNoteEditButton');
@@ -40,6 +41,7 @@ document.addEventListener('DOMContentLoaded', () =>{
 
     //Add event listeners for the side buttons
     createNoteButton.addEventListener('click', () => createNote(null, stateVars));
+    uploadImageButton.addEventListener('click', () => uploadImageButton(stateVars));
     inertiaButton.addEventListener('click', () => toggleInertia(stateVars));
     cutButton.addEventListener('click', () => toggleCut(stateVars));
     cancelEditButton.addEventListener('click', () => cancelEditNote(stateVars));
@@ -74,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () =>{
 
         stateVars.stringLayer.appendChild(stateVars.cutLine);
     });
-
+    
     window.addEventListener('mousemove', (event) => {
         if(stateVars.cutToggle == false) return;
         if(stateVars.cutLine == null) return;
