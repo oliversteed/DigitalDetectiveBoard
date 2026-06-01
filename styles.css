@@ -18,6 +18,16 @@
     padding: 5px;
 }
 
+.image{
+    position: absolute;
+
+    display: inline-block;
+    width: max-content;
+    height: auto;
+
+    background: black;
+}
+
 .draggable:focus{
     background-color: rgb(235, 223, 0);
 }

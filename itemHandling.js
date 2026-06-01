@@ -31,6 +31,7 @@ export function createNote(defaultText, stateVars){
 
     //If user created this note
     if(defaultText == null){
+        //Calculate offset to the middle of the corkboard
         const noteX = calculateOffsetX(stateVars) - 100;
         const noteY = calculateOffsetY(stateVars) - 90;
 
@@ -60,12 +61,45 @@ export function uploadImage(event, stateVars){
     reader.onload = function(e) {
         const imageBase64 = e.target.result;
 
-        //For now, display Base64 in the terminal
-        console.log(imageBase64);
+        createImage(imageBase64, stateVars);
     }
 
     //Initiate reading image from the provided path
     reader.readAsDataURL(image);
+}
+
+function createImage(image, stateVars){
+    const newImage = document.createElement("div"); //Creates the base wrapper div
+    
+    newImage.setAttribute('class', 'draggable image'); //set image to have the draggable class
+    
+    //Calculate offset to the middle of the corkboard
+    const imageX = calculateOffsetX(stateVars) - 100;
+    const imageY = calculateOffsetY(stateVars) - 90;
+
+    //reposition image in the centre of the viewport
+    newImage.style.transform = `translate(${imageX}px, ${imageY}px`;
+
+    //Update interact.js data-x and data-y so it can calculate draggable correctly
+    newImage.setAttribute('data-x', imageX);
+    newImage.setAttribute('data-y', imageY);
+
+    //Create the image element and set its source as the Base64 for the uploaded image.
+    const img = document.createElement('img');
+    img.src = image;
+    img.setAttribute('draggable', 'false'); //Prevent default browser image dragging behaviour
+
+    //Create and append the relevant controls
+    appendDeleteButton(newImage);
+    appendConnectButton(newImage, stateVars);
+
+    //Set image ID and update ID
+    newImage.setAttribute('id', `item${stateVars.itemIDTracker}`);
+    stateVars.itemIDTracker++;
+
+    //Make the image a child of the corkboard base and the img element a child of the wrapper
+    newImage.appendChild(img);
+    stateVars.corkboard.appendChild(newImage);
 }
 
 //Creates and appends a delete button to the passed item.
