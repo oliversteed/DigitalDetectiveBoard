@@ -18,7 +18,8 @@ const stateVars = {
     zoomSpace: null,
     stringLayer: null,
     cutLine: null,
-    zoomLevel: 1
+    zoomLevel: 1,
+    keyMoveSpeed: 20
 }
 
 //Wait for DOM to finish loading then initialise the major elements and add their event listeners
@@ -58,6 +59,9 @@ document.addEventListener('DOMContentLoaded', () =>{
             zoomHandler(event, stateVars);
         }
     });
+
+    //Event listener for arrow key movement
+    document.addEventListener('keydown', () => arrowKeyMovement(event));
 
     //Add the mousedown event listener to the corkboard to manage cut string logic
     stateVars.corkboard.addEventListener('mousedown', (event) => {
@@ -175,6 +179,51 @@ function dragMoveListener(event){
 
     //Update any attached strings
     updateStrings(event.target);
+}
+
+//Function for moving items with the arrow keys
+function arrowKeyMovement(event){
+    let focusItem = document.activeElement;
+
+    var moveSpeed = stateVars.keyMoveSpeed;
+
+    //If a draggable element is not focused, move the corkboard instead. Make the moveSpeed var negative to make the corkboard move intuitively.
+    if(!document.activeElement.classList.contains('draggable')){
+        focusItem = stateVars.corkboard;
+        moveSpeed = moveSpeed * -1;
+    }
+
+    //Get focused item's current coordinates
+    var x = parseFloat(focusItem.getAttribute('data-x'));
+    var y = parseFloat(focusItem.getAttribute('data-y'));
+
+    //Adjust the coordinates based on which arrow key was pressed.
+    switch (event.key){
+        case 'ArrowUp':
+            y = y - moveSpeed;
+            console.log("go up");
+            break;
+        case 'ArrowDown':
+            y = y + moveSpeed;
+            console.log("Go down");
+            break;
+        case 'ArrowLeft':
+            x = x - moveSpeed;
+            console.log("Go left");
+            break;
+        case 'ArrowRight':
+            x = x + moveSpeed;
+            console.log("Go right");
+            break;
+        default:
+            break;
+    }
+
+    focusItem.style.transform = `translate(${x}px, ${y}px)`;
+
+    focusItem.setAttribute('data-x', x);
+    focusItem.setAttribute('data-y', y);
+    
 }
 
 //Logic for updating position/width and height of element when resizing

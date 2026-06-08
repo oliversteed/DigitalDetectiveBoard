@@ -12,7 +12,8 @@ export function createNote(defaultText, stateVars){
     //Set parameter to null if it was just an eventCode passed
     if(defaultText instanceof Event) defaultText = null;
 
-    if(defaultText != null){ //Sets the text content of the note only if text was passed to the function. This is primarily for notes created on load as welcome messages.
+    //Sets the text content of the note only if text was passed to the function. This is primarily for notes created on load as welcome messages.
+    if(defaultText != null){
         noteText.textContent = defaultText;
     }
 
@@ -29,19 +30,18 @@ export function createNote(defaultText, stateVars){
     newNote.setAttribute('id', `item${stateVars.itemIDTracker}`);
     stateVars.itemIDTracker++;
 
-    //If user created this note
-    if(defaultText == null){
-        //Calculate offset to the middle of the corkboard
-        const noteX = calculateOffsetX(stateVars) - 100;
-        const noteY = calculateOffsetY(stateVars) - 90;
 
-        //reposition note in the centre of the viewport
-        newNote.style.transform = `translate(${noteX}px, ${noteY}px`;
+    //Calculate offset to the middle of the corkboard
+    const noteX = calculateOffsetX(stateVars) - 100;
+    const noteY = calculateOffsetY(stateVars) - 90;
 
-        //Update interact.js data-x and data-y so it can calculate draggable correctly
-        newNote.setAttribute('data-x', noteX);
-        newNote.setAttribute('data-y', noteY);
-    }
+    //reposition note in the centre of the viewport
+    newNote.style.transform = `translate(${noteX}px, ${noteY}px`;
+
+    //Update interact.js data-x and data-y so it can calculate draggable correctly
+    newNote.setAttribute('data-x', noteX);
+    newNote.setAttribute('data-y', noteY);
+
 
     //Make the note a child of the corkboard base
     stateVars.corkboard.appendChild(newNote);
