@@ -24,7 +24,7 @@ export function createNote(defaultText, stateVars){
 
     //Set note HTML attributes
     newNote.setAttribute('class', 'draggable note'); //set note to have draggable and note classes
-    newNote.setAttribute('tabindex', '0'); //Insert the div into the tab order, this makes deleteNote work
+    newNote.setAttribute('tabindex', '0'); //Insert the div into the tab order, this makes deleteNote work and assists with accessibility
 
     //Set note ID and update ID
     newNote.setAttribute('id', `item${stateVars.itemIDTracker}`);
@@ -71,7 +71,8 @@ export function uploadImage(event, stateVars){
 function createImage(image, stateVars){
     const newImage = document.createElement("div"); //Creates the base wrapper div
     
-    newImage.setAttribute('class', 'draggable image'); //set image to have the draggable class
+    newImage.setAttribute('class', 'image'); //set image to have the draggable class
+    newImage.setAttribute('tabindex', '0'); //Insert the div into the tab order, this makes deleteNote work and assists with accessibility
     
     //Calculate offset to the middle of the corkboard
     const imageX = calculateOffsetX(stateVars) - 100;

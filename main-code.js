@@ -162,6 +162,31 @@ function setInteractListeners(){
         inertia: false,
         autoScroll: false
     })
+
+    //Interact.js logic for dragging and resizing images
+    interact('.image').resizable({
+        edges: {left: true, right: true, bottom: true, top: true},
+
+        listeners: {move: resizeListener},
+        inertia: false,
+        autoscroll: false,
+        modifiers: [
+            interact.modifiers.aspectRatio({
+                ratio: 'preserve'
+            })
+        ]
+    })
+    .draggable({
+        listeners: {move: dragMoveListener},
+        inertia: stateVars.inertiaToggle,
+        autoScroll: false,
+        modifiers: [
+            interact.modifiers.restrictRect({
+                restriction: 'parent',
+                endOnly: false
+            })
+        ]
+    })
 }
 
 //Logic for updating position of element when dragging
