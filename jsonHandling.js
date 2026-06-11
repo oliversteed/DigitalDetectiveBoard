@@ -17,8 +17,8 @@ export function saveBoard(stateVars){
             text: note.querySelector('p').textContent,
             x: parseFloat(note.getAttribute('data-x')),
             y: parseFloat(note.getAttribute('data-y')),
-            width: note.style.width,
-            height: note.style.height
+            width: note.offsetWidth,
+            height: note.offsetHeight,
         });
     });
 
@@ -29,8 +29,8 @@ export function saveBoard(stateVars){
             src: image.querySelector('img').src,
             x: parseFloat(image.getAttribute('data-x')),
             y: parseFloat(image.getAttribute('data-y')),
-            width: image.style.width,
-            height: image.style.height
+            width: image.offsetWidth,
+            height: image.offsetHeight
         });
     });
 
