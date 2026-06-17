@@ -3,7 +3,7 @@ import { getDataX, getDataY, calculateOffsetX, calculateOffsetY, checkIntersecti
 //Handles the creation, deletion, and editing of notes.
 
 //Creates a new note
-export function createNote(defaultText, stateVars){
+export function createNote(defaultText, stateVars, noteObject){
     const newNote = document.createElement("div"); //Creates the base note div
     const noteText = document.createElement("p"); //Creates a text container
 
@@ -26,22 +26,41 @@ export function createNote(defaultText, stateVars){
     newNote.setAttribute('class', 'draggable note'); //set note to have draggable and note classes
     newNote.setAttribute('tabindex', '0'); //Insert the div into the tab order, this makes deleteNote work and assists with accessibility
 
-    //Set note ID and update ID
-    newNote.setAttribute('id', `item${stateVars.itemIDTracker}`);
-    stateVars.itemIDTracker++;
+    //Declare the variables for the X and Y coordinates of the note
+    var noteX;
+    var noteY;
 
+    //If a note object was passed, set the attributes according to the object's attributes
+    if(noteObject){
+        //Set the id to the id of the passed object
+        newNote.setAttribute('id', noteObject.id);
 
-    //Calculate offset to the middle of the corkboard
-    const noteX = calculateOffsetX(stateVars) - 100;
-    const noteY = calculateOffsetY(stateVars) - 90;
+        //Set the x and y coordinates equal to the values stored in the object.
+        noteX = noteObject.x;
+        noteY = noteObject.y;
 
-    //reposition note in the centre of the viewport
+        //Set the width and height based on the object's stored attributes
+        newNote.style.width = noteObject.width + "px";
+        newNote.style.height = noteObject.height + "px";
+
+        //Set the text of the note based on the object's stored value
+        noteText.textContent = noteObject.text;
+    } else{
+        //Set the id according to the itemIDTracker in the stateVars object and increment the tracker variable
+        newNote.setAttribute('id', `item${stateVars.itemIDTracker}`);
+        stateVars.itemIDTracker++;
+
+        //Calculate offset to the middle of the corkboard
+        noteX = calculateOffsetX(stateVars) - 100;
+        noteY = calculateOffsetY(stateVars) - 90;
+    }
+
+    //reposition the note to the stored X and Y coordinates
     newNote.style.transform = `translate(${noteX}px, ${noteY}px`;
 
     //Update interact.js data-x and data-y so it can calculate draggable correctly
     newNote.setAttribute('data-x', noteX);
     newNote.setAttribute('data-y', noteY);
-
 
     //Make the note a child of the corkboard base
     stateVars.corkboard.appendChild(newNote);
@@ -68,35 +87,57 @@ export function uploadImage(event, stateVars){
     reader.readAsDataURL(image);
 }
 
-function createImage(image, stateVars){
+export function createImage(image, stateVars, loadedImage){
     const newImage = document.createElement("div"); //Creates the base wrapper div
     
     newImage.setAttribute('class', 'image'); //set image to have the draggable class
     newImage.setAttribute('tabindex', '0'); //Insert the div into the tab order, this makes deleteNote work and assists with accessibility
-    
-    //Calculate offset to the middle of the corkboard
-    const imageX = calculateOffsetX(stateVars) - 100;
-    const imageY = calculateOffsetY(stateVars) - 90;
-
-    //reposition image in the centre of the viewport
-    newImage.style.transform = `translate(${imageX}px, ${imageY}px`;
-
-    //Update interact.js data-x and data-y so it can calculate draggable correctly
-    newImage.setAttribute('data-x', imageX);
-    newImage.setAttribute('data-y', imageY);
-
-    //Create the image element and set its source as the Base64 for the uploaded image.
-    const img = document.createElement('img');
-    img.src = image;
-    img.setAttribute('draggable', 'false'); //Prevent default browser image dragging behaviour
 
     //Create and append the relevant controls
     appendDeleteButton(newImage);
     appendConnectButton(newImage, stateVars);
 
-    //Set image ID and update ID
-    newImage.setAttribute('id', `item${stateVars.itemIDTracker}`);
-    stateVars.itemIDTracker++;
+    //Create the image element and set its source as the Base64 for the uploaded image.
+    const img = document.createElement('img');
+    img.setAttribute('draggable', 'false'); //Prevent default browser image dragging behaviour
+    
+    var imageX;
+    var imageY;
+
+    //Check if an image JS object has been passed and set attributes based on the JS object if so. Use default values if not.
+    if(loadedImage){
+        //Set coordinates based off passsed JS object
+        imageX = loadedImage.x;
+        imageY = loadedImage.y;
+
+        //Set source as the JS object's src value
+        img.src = loadedImage.src;
+
+        //Set the id
+        newImage.setAttribute('id', loadedImage.id);
+
+        //Set the width and height of the image
+        newImage.style.width = loadedImage.width + "px";
+        newImage.style.height = loadedImage.height + "px";
+    }else{
+        //Calculate offset to the middle of the corkboard
+        imageX = calculateOffsetX(stateVars) - 100;
+        imageY = calculateOffsetY(stateVars) - 90;
+        
+        //Set the img source
+        img.src = image;
+
+        //Set image ID and update ID
+        newImage.setAttribute('id', `item${stateVars.itemIDTracker}`);
+        stateVars.itemIDTracker++;
+    }
+
+    //reposition image based on the imageX and imageY variable values
+    newImage.style.transform = `translate(${imageX}px, ${imageY}px`;
+
+    //Update interact.js data-x and data-y so it can calculate draggable correctly
+    newImage.setAttribute('data-x', imageX);
+    newImage.setAttribute('data-y', imageY);
 
     //Make the image a child of the corkboard base and the img element a child of the wrapper
     newImage.appendChild(img);
@@ -205,6 +246,13 @@ export function applyEditNote(stateVars){
     stateVars.currentEditedNote = null;
     stateVars.editOverlay.close();
     stateVars.editOverlay.classList.add("hidden");
+}
+
+export function clearBoard(stateVars){
+    document.querySelectorAll('.note').forEach(note => deleteNote(note));
+    document.querySelectorAll('.image').forEach(image => deleteNote(image));
+
+    stateVars.itemIDTracker = 1;
 }
 
 //Delete a note using the note's appended delete button. Does not need an event passed

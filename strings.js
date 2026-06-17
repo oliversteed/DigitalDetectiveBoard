@@ -1,15 +1,47 @@
 //Functions related to the creation, deletion, and management of corkboard strings.
 
 //Creates a string between the 2 notes defined in the global variables "connectStart" and "connectEnd"
-export function makeString(stateVars){
+export function makeString(stateVars, loadedString){
     //Create the string
     const stringLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
 
-    //Get the coordinates
-    const note1X = parseFloat(stateVars.connectStart.getAttribute('data-x')) + (stateVars.connectStart.offsetWidth/2);
-    const note1Y = parseFloat(stateVars.connectStart.getAttribute('data-y')) + (stateVars.connectStart.offsetHeight/2);
-    const note2X = parseFloat(stateVars.connectEnd.getAttribute('data-x')) + (stateVars.connectEnd.offsetWidth/2);
-    const note2Y = parseFloat(stateVars.connectEnd.getAttribute('data-y')) + (stateVars.connectEnd.offsetHeight/2);
+    var note1X;
+    var note1Y;
+    var note2X;
+    var note2Y;
+
+    var startNode;
+    var endNode;
+
+    //Check if a string JS object has been passed. If so, create the string passed on these values
+    if(loadedString){
+        //Get the start and end item IDs based on the passed JS object
+        let startItemID = loadedString.start;
+        let endItemID = loadedString.end;
+
+        let startItem = document.getElementById(startItemID);
+        let endItem = document.getElementById(endItemID);
+
+        //Get the coordinates
+        note1X = parseFloat(startItem.getAttribute('data-x')) + (startItem.offsetWidth/2);
+        note1Y = parseFloat(startItem.getAttribute('data-y')) + (startItem.offsetHeight/2);
+        note2X = parseFloat(endItem.getAttribute('data-x')) + (endItem.offsetWidth/2);
+        note2Y = parseFloat(endItem.getAttribute('data-y')) + (endItem.offsetHeight/2);
+
+        //Set the start and end item IDs
+        startNode = startItemID;
+        endNode = endItemID;
+    }else{
+        //Get the coordinates
+        note1X = parseFloat(stateVars.connectStart.getAttribute('data-x')) + (stateVars.connectStart.offsetWidth/2);
+        note1Y = parseFloat(stateVars.connectStart.getAttribute('data-y')) + (stateVars.connectStart.offsetHeight/2);
+        note2X = parseFloat(stateVars.connectEnd.getAttribute('data-x')) + (stateVars.connectEnd.offsetWidth/2);
+        note2Y = parseFloat(stateVars.connectEnd.getAttribute('data-y')) + (stateVars.connectEnd.offsetHeight/2);
+
+        //Set the start and end item ids
+        startNode = stateVars.connectStart.id;
+        endNode = stateVars.connectEnd.id;
+    }
 
     //Set the SVG line's coordinates
     stringLine.setAttribute("x1", note1X);
@@ -18,8 +50,8 @@ export function makeString(stateVars){
     stringLine.setAttribute("y2", note2Y);
 
     //Track which notes it is connected to
-    stringLine.setAttribute("data-noteStart", stateVars.connectStart.id);
-    stringLine.setAttribute("data-noteEnd", stateVars.connectEnd.id);
+    stringLine.setAttribute("data-noteStart", startNode);
+    stringLine.setAttribute("data-noteEnd", endNode);
 
     //give the string its class
     stringLine.setAttribute("class", "string");

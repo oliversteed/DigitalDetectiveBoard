@@ -2,9 +2,9 @@
 import {checkIntersection, getDataX, getDataY, calculateOffsetX, calculateOffsetY} from "./maths.js";
 import { makeString, updateStrings, removeAttachedStrings } from "./strings.js";
 import { toggleCut, toggleInertia } from "./toggles.js";
-import { createNote, cancelEditNote, applyEditNote, uploadImage } from "./itemHandling.js";
+import { createNote, cancelEditNote, applyEditNote, uploadImage, clearBoard } from "./itemHandling.js";
 import { zoomHandler } from "./zoom.js";
-import { saveBoard } from "./jsonHandling.js";
+import { saveBoard, loadBoard } from "./jsonHandling.js";
 
 //Module-scoped variables stored in an object to easily pass to functions. These store major persistent DOM objects that many functions need to access, or store states that are tracked and modified for the corkboard functionality.
 const stateVars = {
@@ -33,7 +33,9 @@ document.addEventListener('DOMContentLoaded', () =>{
 
     const createNoteButton = document.getElementById('createNoteButton');
     const uploadImageButton = document.getElementById('uploadImageButton');
-    const saveBoardButton = document.getElementById('saveButton')
+    const saveBoardButton = document.getElementById('saveButton');
+    const loadBoardButton = document.getElementById('loadButton');
+    const clearButton = document.getElementById('clearButton');
     const inertiaButton = document.getElementById('inertiaButtonID');
     const cutButton = document.getElementById('cutButtonID');
     const cancelEditButton = document.getElementById('cancelNoteEditButton');
@@ -46,6 +48,8 @@ document.addEventListener('DOMContentLoaded', () =>{
     createNoteButton.addEventListener('click', () => createNote(null, stateVars));
     uploadImageButton.addEventListener('click', () => document.getElementById("uploadedImage").click());
     saveBoardButton.addEventListener('click', () => saveBoard(stateVars));
+    loadBoardButton.addEventListener('click', () => document.getElementById("loadedBoard").click())
+    clearButton.addEventListener('click', () => clearBoard(stateVars));
     inertiaButton.addEventListener('click', () => toggleInertia(stateVars));
     cutButton.addEventListener('click', () => toggleCut(stateVars));
     cancelEditButton.addEventListener('click', () => cancelEditNote(stateVars));
@@ -53,6 +57,7 @@ document.addEventListener('DOMContentLoaded', () =>{
 
     //Add event listener to the hidden image input to check when a new images is being uploaded
     document.getElementById("uploadedImage").addEventListener('change', () => uploadImage(event, stateVars));
+    document.getElementById("loadedBoard").addEventListener('change', () => loadBoard(event, stateVars));
 
     //Event listener for zooming in/out on the corkboard
     stateVars.zoomSpace.addEventListener('wheel', (event) => {

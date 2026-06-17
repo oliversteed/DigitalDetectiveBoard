@@ -1,3 +1,5 @@
+import { makeString } from "./strings.js";
+import { createNote, createImage, clearBoard } from "./itemHandling.js";
 //This handles JSON related functions such as saving and loading boards.
 
 //This function takes the states object from main-code and then constructs a save data object to capture the current state of the board
@@ -65,4 +67,39 @@ export function saveBoard(stateVars){
 
     //Remove the pointer to the blob address to allow garbage collection to clear browser RAM
     URL.revokeObjectURL(downloadURL);
+}
+
+export function loadBoard(event, stateVars){
+
+    const board = event.target.files[0];
+
+    //Return if there is no uploaded file
+    if(!board) return;
+
+    const reader = new FileReader();
+
+    //Once reader is loaded, parse the JSON from the .board file and pass the created JS board state object to the rehydration function
+    reader.onload = function(e){
+        const loadedBoard = JSON.parse(e.target.result);
+
+        rehydrateJson(loadedBoard, stateVars);
+    }
+
+    //Initiate reading the text content of the file
+    reader.readAsText(board);
+}
+
+function rehydrateJson(board, stateVars){
+    //Clear the board before loading the new file
+    clearBoard(stateVars);
+
+    //Pass each note object through the createNote function
+    board.notes.forEach(note => createNote(null, stateVars, note));
+
+    //Pass each image object through the createImage function
+    board.images.forEach(image => createImage(null, stateVars, image));
+
+    board.strings.forEach(string => makeString(stateVars, string));
+
+    stateVars.itemIDTracker = board.currentID;
 }
