@@ -1,7 +1,7 @@
 //Import other JS files
 import {checkIntersection, getDataX, getDataY, calculateOffsetX, calculateOffsetY} from "./maths.js";
 import { makeString, updateStrings, removeAttachedStrings } from "./strings.js";
-import { toggleCut, toggleInertia } from "./toggles.js";
+import { toggleCut } from "./toggles.js";
 import { createNote, cancelEditNote, applyEditNote, uploadImage, clearBoard } from "./itemHandling.js";
 import { zoomHandler } from "./zoom.js";
 import { saveBoard, loadBoard } from "./jsonHandling.js";
@@ -36,7 +36,6 @@ document.addEventListener('DOMContentLoaded', () =>{
     const saveBoardButton = document.getElementById('saveButton');
     const loadBoardButton = document.getElementById('loadButton');
     const clearButton = document.getElementById('clearButton');
-    const inertiaButton = document.getElementById('inertiaButtonID');
     const cutButton = document.getElementById('cutButtonID');
     const cancelEditButton = document.getElementById('cancelNoteEditButton');
     const applyEditButton = document.getElementById('applyNoteEditButton');
@@ -50,7 +49,6 @@ document.addEventListener('DOMContentLoaded', () =>{
     saveBoardButton.addEventListener('click', () => saveBoard(stateVars));
     loadBoardButton.addEventListener('click', () => document.getElementById("loadedBoard").click())
     clearButton.addEventListener('click', () => clearBoard(stateVars));
-    inertiaButton.addEventListener('click', () => toggleInertia(stateVars));
     cutButton.addEventListener('click', () => toggleCut(stateVars));
     cancelEditButton.addEventListener('click', () => cancelEditNote(stateVars));
     applyEditButton.addEventListener('click', () => applyEditNote(stateVars));

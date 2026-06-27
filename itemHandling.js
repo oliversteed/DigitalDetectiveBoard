@@ -147,6 +147,14 @@ export function createImage(image, stateVars, loadedImage){
 //Creates and appends a delete button to the passed item.
 function appendDeleteButton(item){
     const deleteButton = document.createElement("button"); //Creates the delete button
+    const deleteIcon = document.createElement("img"); //Creates the delete button icon element
+
+    //Sets the attributes for the delete button's icon
+    deleteIcon.setAttribute('class', 'smallIcon');
+    deleteIcon.setAttribute('src', 'Resources/x-lg.svg');
+
+    //Append the icon to the button
+    deleteButton.appendChild(deleteIcon);
 
     //Logic for the delete note button
     deleteButton.setAttribute('class', 'deleteButton');
@@ -168,6 +176,13 @@ function appendDeleteButton(item){
 //Creates and appends an edit button to the passed item.
 function appendEditButton(item, stateVars){
     const editButton = document.createElement("button"); //Creates the edit button
+    const editIcon = document.createElement("img"); //Creates the edit button icon element
+
+    //Sets the attributes for the edit button's icon
+    editIcon.setAttribute('class', 'smallIcon');
+    editIcon.setAttribute('src', 'Resources/pencil.svg');
+
+    editButton.append(editIcon); //Appends the icon to the button
 
     editButton.setAttribute('class', 'editButton'); //Give editButton the appropriate class
     editButton.onclick = function(event){ //The logic for the notes' edit buttons
@@ -193,6 +208,13 @@ function appendEditButton(item, stateVars){
 //Creates and appends a connect button to the passed item.
 function appendConnectButton(item, stateVars){
     const connectButton = document.createElement("button"); //Creates the button to connect with "string"
+    const connectIcon = document.createElement("img"); //Creates the connect button icon element
+
+    //Sets the attributes for the connect button's icon
+    connectIcon.setAttribute('class', 'smallIconConnect');
+    connectIcon.setAttribute('src', 'Resources/link-45deg.svg');
+
+    connectButton.appendChild(connectIcon); //Appends the icon to the button
 
     connectButton.setAttribute('class', 'connectButton');
     connectButton.onclick = function(event){

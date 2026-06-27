@@ -50,18 +50,63 @@
 }
 
 .sideBar{
-    width: 150px;
+    width: 100px;
     flex-shrink: 0;
-    background-color: aliceblue;
+    background-color: rgb(255, 245, 194);
+    box-sizing: border-box;
+    border-color: brown;
+    border-style: solid;
+    border-width: 5px;
 }
 
 .sideButton{
     display: block;
     overflow: auto;
-    padding: 10px;
     margin: 0;
     cursor: pointer;
     user-select: none;
+    width: 80px;
+    margin: 5px;
+    background-color: white;
+    border-style: solid;
+    border-color: black;
+    border-radius: 10px;
+}
+
+.sideButtonActive{
+    border-color: transparent; 
+    background-image:   linear-gradient(to right, black 50%, transparent 50%),
+                        linear-gradient(to right, black 50%, transparent 50%),
+                        linear-gradient(to bottom, black 50%, transparent 50%),
+                        linear-gradient(to bottom, black 50%, transparent 50%);
+    background-size: 21px 3px, 21px 3px, 3px 21px, 3px 21px;
+    background-position: 0 0, 0 100%, 0 0, 100% 0;
+    background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
+
+    animation: activeAnimation 1s linear infinite;
+}
+
+@keyframes activeAnimation {
+    to{
+        background-position: 20px 0, -20px 100%, 0 -20px, 100% 20px;
+    }
+}
+
+.icon{
+    height: 100%;
+    width: 100%;
+}
+
+.smallIcon{
+    height: 70%;
+    width: 70%;
+    margin-top: 10%;
+}
+
+.smallIconConnect{
+    height: 80%;
+    width: 80%;
+    margin-top: 10%;
 }
 
 .sideButton:hover{

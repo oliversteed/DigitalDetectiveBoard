@@ -14,19 +14,12 @@
         <input aria-hidden="true" type="file" id="uploadedImage" accept="image/*" style="display: none;">
         <input aria-hidden="true" type="file" id="loadedBoard" accept=".board" style="display: none;">
         <a aria-hidden="true" id="downloadLink" style="display: none;"></a>
-        <a class="sideButton" id="createNoteButton" tabindex="0">Create note</a>
-        <a class="sideButton" id="uploadImageButton" tabindex="0">Upload image</a>
-        <a class="sideButton" id="saveButton" tabindex="0">Save board</a>
-        <a class="sideButton" id="loadButton" tabindex="0">Load board</a>
-        <a class="sideButton" id="clearButton" tabindex="0">Clear board</a>
-        <div class="sideButton">
-            <a id="inertiaButtonID" tabindex="0">Inertia</a>
-            <div id="inertiaButton"></div>
-        </div>
-        <div class="sideButton">
-            <a id="cutButtonID" tabindex="0">Cut strings</a>
-            <div id="cutButton"></div>
-        </div>
+        <button class="sideButton" id="createNoteButton" tabindex="0"><img class="icon" title="Create a new note" src="Resources/plus-square.svg" draggable="false"></button>
+        <button class="sideButton" id="uploadImageButton" tabindex="0"><img class="icon" src="Resources/upload.svg" draggable="false"></button>
+        <button class="sideButton" id="saveButton" tabindex="0"><img class="icon" src="Resources/floppy.svg" draggable="false"></button>
+        <button class="sideButton" id="loadButton" tabindex="0"><img class="icon" src="Resources/box-arrow-in-down.svg" draggable="false"></button>
+        <button class="sideButton" id="clearButton" tabindex="0"><img class="icon" src="Resources/clipboard2-x.svg" draggable="false"></button>
+        <button class="sideButton" id="cutButtonID" tabindex="0"><img class="icon" src="Resources/scissors.svg" draggable="false"></button>
     </div>
     <div id="viewport">
         <div id="zoomSpace">
