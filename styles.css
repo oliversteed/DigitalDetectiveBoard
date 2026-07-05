@@ -28,6 +28,10 @@
     background: black;
 
     user-select: none;
+
+    border-color: white;
+    border-width: 5px;
+    border-style: solid;
 }
 
 .image img{
