@@ -30,29 +30,41 @@ export function createNote(defaultText, stateVars, noteObject){
     var noteX;
     var noteY;
 
-    //If a note object was passed, set the attributes according to the object's attributes
-    if(noteObject){
-        //Set the id to the id of the passed object
+    //Set the id to an id from the passed object if possible, use the itemIDTracker if not    
+    if(noteObject && noteObject.id){
         newNote.setAttribute('id', noteObject.id);
-
-        //Set the x and y coordinates equal to the values stored in the object.
-        noteX = noteObject.x;
-        noteY = noteObject.y;
-
-        //Set the width and height based on the object's stored attributes
-        newNote.style.width = noteObject.width + "px";
-        newNote.style.height = noteObject.height + "px";
-
-        //Set the text of the note based on the object's stored value
-        noteText.textContent = noteObject.text;
     } else{
-        //Set the id according to the itemIDTracker in the stateVars object and increment the tracker variable
         newNote.setAttribute('id', `item${stateVars.itemIDTracker}`);
-        stateVars.itemIDTracker++;
+        stateVars.itemIDTracker ++;
+    }
 
-        //Calculate offset to the middle of the corkboard
+    //Set the x coordinate property to the value from the passed object if possible, use the default centering if not.
+    if(noteObject && noteObject.x){
+        noteX = noteObject.x;
+    } else{
         noteX = calculateOffsetX(stateVars) - 100;
+    }
+
+    //Set the y coordinate property to the value from the passed object if possible, use the default centering if not.
+    if(noteObject && noteObject.y){
+        noteY = noteObject.y;
+    } else{
         noteY = calculateOffsetY(stateVars) - 90;
+    }
+
+    //Set the width if possible
+    if(noteObject && noteObject.width){
+        newNote.style.width = noteObject.width + "px";
+    }
+
+    //Set the height if possible
+    if(noteObject && noteObject.height){
+        newNote.style.height = noteObject.height + "px";
+    }
+
+    //Set the text content if possible
+    if(noteObject && noteObject.text){
+        noteText.textContent = noteObject.text;
     }
 
     //reposition the note to the stored X and Y coordinates
@@ -100,36 +112,48 @@ export function createImage(image, stateVars, loadedImage){
     //Create the image element and set its source as the Base64 for the uploaded image.
     const img = document.createElement('img');
     img.setAttribute('draggable', 'false'); //Prevent default browser image dragging behaviour
+    img.setAttribute('class', 'innerImg');
     
     var imageX;
     var imageY;
 
-    //Check if an image JS object has been passed and set attributes based on the JS object if so. Use default values if not.
-    if(loadedImage){
-        //Set coordinates based off passsed JS object
-        imageX = loadedImage.x;
-        imageY = loadedImage.y;
-
-        //Set source as the JS object's src value
-        img.src = loadedImage.src;
-
-        //Set the id
+    //Set the id to an id from the passed object if possible, use the itemIDTracker if not
+    if(loadedImage && loadedImage.id){
         newImage.setAttribute('id', loadedImage.id);
-
-        //Set the width and height of the image
-        newImage.style.width = loadedImage.width + "px";
-        newImage.style.height = loadedImage.height + "px";
-    }else{
-        //Calculate offset to the middle of the corkboard
-        imageX = calculateOffsetX(stateVars) - 100;
-        imageY = calculateOffsetY(stateVars) - 90;
-        
-        //Set the img source
-        img.src = image;
-
-        //Set image ID and update ID
+    } else{
         newImage.setAttribute('id', `item${stateVars.itemIDTracker}`);
         stateVars.itemIDTracker++;
+    }
+
+    //Set the x coordinate property to the value passed by the loadedImage object if possible, otherwise use default centering.
+    if(loadedImage && loadedImage.x){
+        imageX = loadedImage.x;
+    } else{
+        imageX = calculateOffsetX(stateVars) - 100;
+    }
+
+    //Set the y coordinate property to the value passed by the loadedImage object if possible, otherwise use default centering.
+    if(loadedImage && loadedImage.y){
+        imageY = loadedImage.y;
+    } else{
+        imageY = calculateOffsetY(stateVars) - 90;
+    }
+
+    //Set the image source from the passed image object if possible, otherwise set it to the passed source parameter "image". At least one of these should never be null.
+    if(loadedImage && loadedImage.src){
+        img.src = loadedImage.src;
+    } else{
+        img.src = image;
+    }
+
+    //Set width if possible
+    if(loadedImage && loadedImage.width){
+        newImage.style.width = loadedImage.width + "px";
+    }
+
+    //Set height if possible
+    if(loadedImage && loadedImage.height){
+        newImage.style.height = loadedImage.height + "px";
     }
 
     //reposition image based on the imageX and imageY variable values

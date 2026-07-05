@@ -2,9 +2,9 @@
 import {checkIntersection, getDataX, getDataY, calculateOffsetX, calculateOffsetY} from "./maths.js";
 import { makeString, updateStrings, removeAttachedStrings } from "./strings.js";
 import { toggleCut } from "./toggles.js";
-import { createNote, cancelEditNote, applyEditNote, uploadImage, clearBoard } from "./itemHandling.js";
+import { createNote, createImage, cancelEditNote, applyEditNote, uploadImage, clearBoard } from "./itemHandling.js";
 import { zoomHandler } from "./zoom.js";
-import { saveBoard, loadBoard } from "./jsonHandling.js";
+import { saveBoard, loadBoard, saveNote, saveImage } from "./jsonHandling.js";
 
 //Module-scoped variables stored in an object to easily pass to functions. These store major persistent DOM objects that many functions need to access, or store states that are tracked and modified for the corkboard functionality.
 const stateVars = {
@@ -19,8 +19,9 @@ const stateVars = {
     zoomSpace: null,
     stringLayer: null,
     cutLine: null,
+    clipboard: null,
     zoomLevel: 1,
-    keyMoveSpeed: 20
+    keyMoveSpeed: 20,
 }
 
 //Wait for DOM to finish loading then initialise the major elements and add their event listeners
@@ -68,6 +69,44 @@ document.addEventListener('DOMContentLoaded', () =>{
 
     //Event listener for arrow key movement
     document.addEventListener('keydown', () => arrowKeyMovement(event));
+
+    //Event listener for clipboard copy/paste
+    document.addEventListener('keydown', (event) => {
+        //Store the current focused element
+        let focus = document.activeElement;
+        if(event.ctrlKey && event.key.toLowerCase() === 'c'){
+            //If the focused element is a note, convert it to a JS object and store it in the stateVars as the current clipboard object. Remove the id property to prevent it being created with a duplicate id
+            if(focus.classList.contains('note')){
+                stateVars.clipboard = saveNote(focus);
+                delete stateVars.clipboard.id;
+                stateVars.clipboard.type = 'note'; //Add the note type so the correct function is used when pasting
+                console.log(stateVars.clipboard);
+            }
+            if(focus.classList.contains('image')){
+                stateVars.clipboard = saveImage(focus);
+                delete stateVars.clipboard.id;
+                stateVars.clipboard.type = 'image'; //Add the note type so the correct function is used when pasting
+            }
+        } else if(event.ctrlKey && event.key.toLowerCase() === 'v'){
+            //Shift the coordinates of the stored object slightly to ensure it is not pasted directly ontop of the original object.
+            stateVars.clipboard.x += 20;
+            stateVars.clipboard.y += 20;
+
+            //Depending on which type of object is stored in the clipboard, use the relevant function to create that object.
+            if(stateVars.clipboard){
+                switch (stateVars.clipboard.type){
+                    case 'note':
+                        createNote(null, stateVars, stateVars.clipboard);
+                        break;
+                    case 'image':
+                        createImage(null, stateVars, stateVars.clipboard);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+    });
 
     //Add the mousedown event listener to the corkboard to manage cut string logic
     stateVars.corkboard.addEventListener('mousedown', (event) => {
@@ -229,22 +268,18 @@ function arrowKeyMovement(event){
     var y = parseFloat(focusItem.getAttribute('data-y'));
 
     //Adjust the coordinates based on which arrow key was pressed.
-    switch (event.key){
+    switch(event.key){
         case 'ArrowUp':
             y = y - moveSpeed;
-            console.log("go up");
             break;
         case 'ArrowDown':
             y = y + moveSpeed;
-            console.log("Go down");
             break;
         case 'ArrowLeft':
             x = x - moveSpeed;
-            console.log("Go left");
             break;
         case 'ArrowRight':
             x = x + moveSpeed;
-            console.log("Go right");
             break;
         default:
             break;

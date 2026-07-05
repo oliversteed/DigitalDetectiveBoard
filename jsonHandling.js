@@ -14,34 +14,17 @@ export function saveBoard(stateVars){
 
     //Iterate over every note on the board and construct an object containing its attributes. For every note object created, push that to the notes array in the save state object.
     document.querySelectorAll('.note').forEach(note => {
-        boardData.notes.push({
-            id: note.getAttribute('id'),
-            text: note.querySelector('p').textContent,
-            x: parseFloat(note.getAttribute('data-x')),
-            y: parseFloat(note.getAttribute('data-y')),
-            width: note.offsetWidth,
-            height: note.offsetHeight,
-        });
+        boardData.notes.push(saveNote(note));
     });
 
     //Iterate over every image on the board and construct an object containing its attributes. For every image object created, push that to the images array in the save state object.
     document.querySelectorAll('.image').forEach(image => {
-        boardData.images.push({
-            id: image.getAttribute('id'),
-            src: image.querySelector('img').src,
-            x: parseFloat(image.getAttribute('data-x')),
-            y: parseFloat(image.getAttribute('data-y')),
-            width: image.offsetWidth,
-            height: image.offsetHeight
-        });
+        boardData.images.push(saveImage(image));
     });
 
     //Iterate over every string on the board and construct an object containing its start and end connection IDs. For every string object created, push that to the strings array in the save state object.
     document.querySelectorAll('.string').forEach(string => {
-        boardData.strings.push({
-            start: string.getAttribute('data-noteStart'),
-            end: string.getAttribute('data-noteEnd')
-        });
+        boardData.strings.push(saveString(string));
     });
 
     //Create the JSON string from the save data object
@@ -99,7 +82,47 @@ function rehydrateJson(board, stateVars){
     //Pass each image object through the createImage function
     board.images.forEach(image => createImage(null, stateVars, image));
 
+    //Pass each string object through the makeString function
     board.strings.forEach(string => makeString(stateVars, string));
 
+    //Set the save item ID tracker value from the loaded JSON
     stateVars.itemIDTracker = board.currentID;
+}
+
+//Takes a reference to a note from the board and converts it to a Javascript Object then returns that object.
+export function saveNote(note){
+    const savedObj = {
+        id: note.getAttribute('id'),
+        text: note.querySelector('p').textContent,
+        x: parseFloat(note.getAttribute('data-x')),
+        y: parseFloat(note.getAttribute('data-y')),
+        width: note.offsetWidth,
+        height: note.offsetHeight,
+    }
+
+    return savedObj;
+}
+
+//Takes a reference to an image from the board and converts it to a Javascript Object then returns that object.
+export function saveImage(image){
+    const savedObj = {
+        id: image.getAttribute('id'),
+        src: image.querySelector('img.innerImg').src,
+        x: parseFloat(image.getAttribute('data-x')),
+        y: parseFloat(image.getAttribute('data-y')),
+        width: image.offsetWidth,
+        height: image.offsetHeight
+    }
+
+    return savedObj;
+}
+
+//Takes a reference to a string from the board and converts it to a Javascript Object then returns that object.
+function saveString(string){
+    const savedObj = {
+        start: string.getAttribute('data-noteStart'),
+        end: string.getAttribute('data-noteEnd')
+    }
+
+    return savedObj
 }
