@@ -30,26 +30,60 @@ export function saveBoard(stateVars){
     //Create the JSON string from the save data object
     const json = JSON.stringify(boardData, null, 2);
 
-    //Store the hidden link element to enable downloading the file
-    const dlLink = document.getElementById('downloadLink');
+    //Check the file picker is supported in the browser. Use if supported, download directly to downloads if unsupported.
+    if('showSaveFilePicker' in window){
+        saveBoardAs(json);
+    } else{
+        //Store the hidden link element to enable downloading the file
+        const dlLink = document.getElementById('downloadLink');
 
-    //Create a binary large object with the json string to prepare for download
-    const blob = new Blob([json], {type: 'application/json'});
+        //Create a binary large object with the json string to prepare for download
+        const blob = new Blob([json], {type: 'application/json'});
 
-    //Create a temporary URL pointing to the newly created blob
-    const downloadURL = URL.createObjectURL(blob);
+        //Create a temporary URL pointing to the newly created blob
+        const downloadURL = URL.createObjectURL(blob);
 
-    //Set the invisible download link to the blob URL
-    dlLink.href = downloadURL;
+        //Set the invisible download link to the blob URL
+        dlLink.href = downloadURL;
 
-    //Set download filename
-    dlLink.download = `New-Board-${Date.now()}.board`;
+        //Set download filename
+        dlLink.download = `New-Board-${Date.now()}.board`;
 
-    //Simulate link click to initiate the download
-    dlLink.click();
+        //Simulate link click to initiate the download
+        dlLink.click();
 
-    //Remove the pointer to the blob address to allow garbage collection to clear browser RAM
-    URL.revokeObjectURL(downloadURL);
+        //Remove the pointer to the blob address to allow garbage collection to clear browser RAM
+        URL.revokeObjectURL(downloadURL);
+    }
+}
+
+async function saveBoardAs(json){
+    try{
+        //Open the file picker window with the specified options.
+        const saveWindow = await window.showSaveFilePicker({
+            id: 1,
+            startIn: "documents",
+            suggestedName: "my_board.board",
+            types: [{
+                description: "Corkboard save file",
+                accept: {
+                    //Accepts the custom extension for corkboard save files.
+                    'application/json': ['.board']
+                }
+            }]
+        });
+
+        //Write the json file to the selected file location 
+        const savedFile = await saveWindow.createWritable();
+        await savedFile.write(json);
+        await savedFile.close();
+
+    //If an error occurs during the process that is not the user aborting the save window, catch and write the error to the console.
+    } catch(error){
+        if(error.name !== 'AbortError'){
+            console.error("Save unsuccessful:", error);
+        }
+    }
 }
 
 export function loadBoard(event, stateVars){
