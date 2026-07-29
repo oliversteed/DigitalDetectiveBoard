@@ -1,3 +1,13 @@
+body{
+    background: repeating-linear-gradient(
+        135deg,
+        rgb(221, 221, 221),
+        rgb(221, 221, 221) 10px,
+        rgb(205, 204, 204) 10px,
+        rgb(205, 204, 204) 20px
+    );
+}
+
 .note{
     background-color: rgb(255, 242, 0);
     color: rgb(0, 0, 0);

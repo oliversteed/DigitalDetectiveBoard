@@ -4,31 +4,7 @@ import { createNote, createImage, clearBoard } from "./itemHandling.js";
 
 //This function takes the states object from main-code and then constructs a save data object to capture the current state of the board
 export function saveBoard(stateVars){
-    //Initialise the save state object
-    const boardData = {
-        currentID: stateVars.itemIDTracker,
-        notes: [],
-        images: [],
-        strings: []
-    }
-
-    //Iterate over every note on the board and construct an object containing its attributes. For every note object created, push that to the notes array in the save state object.
-    document.querySelectorAll('.note').forEach(note => {
-        boardData.notes.push(saveNote(note));
-    });
-
-    //Iterate over every image on the board and construct an object containing its attributes. For every image object created, push that to the images array in the save state object.
-    document.querySelectorAll('.image').forEach(image => {
-        boardData.images.push(saveImage(image));
-    });
-
-    //Iterate over every string on the board and construct an object containing its start and end connection IDs. For every string object created, push that to the strings array in the save state object.
-    document.querySelectorAll('.string').forEach(string => {
-        boardData.strings.push(saveString(string));
-    });
-
-    //Create the JSON string from the save data object
-    const json = JSON.stringify(boardData, null, 2);
+    const json = boardToJson(stateVars);
 
     //Check the file picker is supported in the browser. Use if supported, download directly to downloads if unsupported.
     if('showSaveFilePicker' in window){
@@ -55,6 +31,36 @@ export function saveBoard(stateVars){
         //Remove the pointer to the blob address to allow garbage collection to clear browser RAM
         URL.revokeObjectURL(downloadURL);
     }
+}
+
+export function boardToJson(stateVars){
+    //Initialise the save state object
+    const boardData = {
+        currentID: stateVars.itemIDTracker,
+        notes: [],
+        images: [],
+        strings: []
+    }
+
+    //Iterate over every note on the board and construct an object containing its attributes. For every note object created, push that to the notes array in the save state object.
+    document.querySelectorAll('.note').forEach(note => {
+        boardData.notes.push(saveNote(note));
+    });
+
+    //Iterate over every image on the board and construct an object containing its attributes. For every image object created, push that to the images array in the save state object.
+    document.querySelectorAll('.image').forEach(image => {
+        boardData.images.push(saveImage(image));
+    });
+
+    //Iterate over every string on the board and construct an object containing its start and end connection IDs. For every string object created, push that to the strings array in the save state object.
+    document.querySelectorAll('.string').forEach(string => {
+        boardData.strings.push(saveString(string));
+    });
+
+    //Create the JSON string from the save data object
+    const json = JSON.stringify(boardData, null, 2);
+
+    return json;
 }
 
 async function saveBoardAs(json){
@@ -97,16 +103,16 @@ export function loadBoard(event, stateVars){
 
     //Once reader is loaded, parse the JSON from the .board file and pass the created JS board state object to the rehydration function
     reader.onload = function(e){
-        const loadedBoard = JSON.parse(e.target.result);
-
-        rehydrateJson(loadedBoard, stateVars);
+        rehydrateJson(e.target.result, stateVars);
     }
 
     //Initiate reading the text content of the file
     reader.readAsText(board);
 }
 
-function rehydrateJson(board, stateVars){
+export function rehydrateJson(board, stateVars){
+    board = JSON.parse(board);
+
     //Clear the board before loading the new file
     clearBoard(stateVars);
 

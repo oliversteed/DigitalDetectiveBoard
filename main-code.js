@@ -4,7 +4,7 @@ import { makeString, updateStrings, removeAttachedStrings } from "./strings.js";
 import { toggleCut } from "./toggles.js";
 import { createNote, createImage, cancelEditNote, applyEditNote, uploadImage, clearBoard } from "./itemHandling.js";
 import { zoomHandler } from "./zoom.js";
-import { saveBoard, loadBoard, saveNote, saveImage } from "./jsonHandling.js";
+import { saveBoard, loadBoard, saveNote, saveImage, boardToJson, rehydrateJson } from "./jsonHandling.js";
 
 //Module-scoped variables stored in an object to easily pass to functions. These store major persistent DOM objects that many functions need to access, or store states that are tracked and modified for the corkboard functionality.
 const stateVars = {
@@ -22,6 +22,8 @@ const stateVars = {
     clipboard: null,
     zoomLevel: 1,
     keyMoveSpeed: 20,
+    dbActive: false,
+    db: null,
 }
 
 //Wait for DOM to finish loading then initialise the major elements and add their event listeners
@@ -167,8 +169,105 @@ document.addEventListener('DOMContentLoaded', () =>{
         stateVars.cutLine.remove();
     });
 
-    createNote("Welcome to this website!", stateVars);
+    //Request to open the indexedDB database
+    const dbRequest = window.indexedDB.open("backupDB", 1);
+
+    //On first time initialisation, or in the event the DB version is increased, open a new object store named "backups"
+    dbRequest.onupgradeneeded = (event) => {
+        const database = event.target.result;
+
+        if (!database.objectStoreNames.contains('backups')){
+            database.createObjectStore('backups', {keyPath: 'id'});
+        }
+    }
+
+    //Throw an error to the console and set dbActive to false in the case something goes wrong
+    dbRequest.onerror = (event) => {
+        console.error(`Unable to open database. Backup saving is disabled. Errror: ${event.target.error?.message}`);
+        stateVars.dbActive = false;
+    };
+
+    //On success, set the db and dbActive in the state variables object
+    dbRequest.onsuccess = (event) => {
+        stateVars.db = event.target.result;
+        stateVars.dbActive = true;
+
+        //Make a request and check if there is an autosave already within the database
+        const transaction = stateVars.db.transaction(['backups'], 'readonly');
+        const store = transaction.objectStore('backups');
+        const getRequest = store.get('autosave');
+
+        getRequest.onsuccess = () => {
+            const boardBackup = getRequest.result;
+
+            //If the backup exists and contains content, rehydrate the saved JSON. Otherwise, create the welcome note.
+            if(boardBackup && boardBackup.content){
+                rehydrateJson(boardBackup.content, stateVars);
+            } else{
+                createNote("Welcome to this website!", stateVars);
+            }
+        }
+
+        
+        getRequest.onerror = () => {
+            createNote("Welcome to this website!", stateVars);
+        }
+
+    }
+
+    //Set the debounce function to wrap the backupBoard function
+    const autoSave = debounce(() => backupBoard());
+
+    //Autosave when user interactions are detected
+    document.addEventListener('input', autoSave);
+    document.addEventListener('change', autoSave);
+    document.addEventListener('click', autoSave);
+
+    //Autosave when interact.js interactions end for dragging and resizing.
+    window.addEventListener('dragend', autoSave);
+    window.addEventListener('resizeend', autoSave);
 })
+
+//Debounce function sets a 500 ms delay before initiating the passed function
+function debounce(func, delay = 500) {
+    let timer;
+    return (...args) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => {func.apply(this, args);}, delay);
+    }
+}
+
+//Autosave the board to the database
+function backupBoard(){
+    //Do not autosave if the database is inactive
+    if(!stateVars.dbActive) return;
+
+    console.log("Autosaving board");
+    const json = boardToJson(stateVars);
+    saveToDB(json);
+
+}
+
+function saveToDB(json){
+    const transaction = stateVars.db.transaction(['backups'], 'readwrite');
+    const store = transaction.objectStore('backups');
+
+    const record = {
+        id: 'autosave',
+        content: json,
+        updated: Date.now()
+    };
+
+    const request = store.put(record);
+
+    request.onsuccess = () => {
+        console.log("autosaving complete");
+    }
+
+    request.onerror = (e) => {
+        console.log(`Autosaving failed. Errror: ${e.target.error?.message}`);
+    }
+}
 
 //Sets the listeners for Interact.JS to work.
 function setInteractListeners(){
@@ -197,15 +296,33 @@ function setInteractListeners(){
     interact('.corkdrag').resizable({
         //Does not allow resizing of the corkboard
         edges: {left: false, right: false, bottom: false, top: false},
-
+        
         listeners: {move: resizeListener},
         inertia: false,
         autoScroll: false,
     })
     .draggable({
         listeners: {move: dragMoveListener},
+        mouseButtons: 4, //Use middlemouse click
         inertia: false,
         autoScroll: false
+    })
+
+    //Allows middlemouse dragging the background of the page to move the corkboard
+    interact(document.body).draggable({
+        mouseButtons: 4, //Use middlemouse click
+        listeners: {
+            move(event){
+                //Update the new position of the corkboard based on the drag event
+                var x = (parseFloat(corkboard.getAttribute('data-x')) || 0) + event.dx;
+                var y = (parseFloat(corkboard.getAttribute('data-y')) || 0) + event.dy;
+
+                //Update the corkboard element's position and its data-x and data-y values
+                corkboard.style.transform = `translate(${x}px, ${y}px)`;
+                corkboard.setAttribute('data-x', x);
+                corkboard.setAttribute('data-y', y);
+            }
+        }
     })
 
     //Interact.js logic for dragging and resizing images
