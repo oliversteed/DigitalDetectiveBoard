@@ -247,13 +247,13 @@ document.addEventListener('DOMContentLoaded', () =>{
             if(boardBackup && boardBackup.content){
                 rehydrateJson(boardBackup.content, stateVars);
             } else{
-                createNote("Welcome to this website!", stateVars);
+                createNote("Welcome to the Digital Detective Board! Use middle mouse click to pan the board around, or drag it using left click.", stateVars);
             }
         }
 
         
         getRequest.onerror = () => {
-            createNote("Welcome to this website!", stateVars);
+            createNote("Welcome to the Digital Detective Board! Use middle mouse click to pan the board around, or drag it using left click.", stateVars);
         }
 
     }
@@ -346,7 +346,7 @@ function setInteractListeners(){
     })
     .draggable({
         listeners: {move: dragMoveListener},
-        mouseButtons: 4, //Use middlemouse click
+        mouseButtons: 1 | 4, //Use middlemouse click or left mouse click
         inertia: false,
         autoScroll: false
     })
