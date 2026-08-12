@@ -112,7 +112,7 @@ export function createImage(image, stateVars, loadedImage){
     newImage.setAttribute('tabindex', '0'); //Insert the div into the tab order, this makes deleteNote work and assists with accessibility
 
     //Create and append the relevant controls
-    appendDeleteButton(newImage);
+    appendDeleteButton(newImage, stateVars);
     appendConnectButton(newImage, stateVars);
 
     //Create the image element and set its source as the Base64 for the uploaded image.
