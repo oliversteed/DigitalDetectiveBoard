@@ -18,7 +18,7 @@ export function createNote(defaultText, stateVars, noteObject){
     }
 
     //Create and add all relevant buttons
-    appendDeleteButton(newNote);
+    appendDeleteButton(newNote, stateVars);
     appendEditButton(newNote, stateVars);
     appendConnectButton(newNote, stateVars);
 
@@ -175,7 +175,7 @@ export function createImage(image, stateVars, loadedImage){
 }
 
 //Creates and appends a delete button to the passed item.
-function appendDeleteButton(item){
+function appendDeleteButton(item, stateVars){
     const deleteButton = document.createElement("button"); //Creates the delete button
     const deleteIcon = document.createElement("img"); //Creates the delete button icon element
 
@@ -193,12 +193,13 @@ function appendDeleteButton(item){
         //Prevents a potential string connection attempt when the delete button is clicked
         event.stopPropagation();
         
-        deleteNote(item);
+        //prevent deleting the item if a string connection is currently in process originating from this item
+        if(stateVars.connectStart != item) deleteNote(item);
     });
 
     //Add event listener to allow use of DEL key
     item.addEventListener('keydown', event => {
-        if(event.code == "Delete"){
+        if((event.code == "Delete") && stateVars.connectStart != item){
             deleteNote(item);
         }
     });
