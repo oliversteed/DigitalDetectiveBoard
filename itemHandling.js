@@ -1,4 +1,4 @@
-import { removeAttachedStrings, makeString } from "./strings.js";
+import { removeAttachedStrings, makeString, makeTempString } from "./strings.js";
 import { getDataX, getDataY, calculateOffsetX, calculateOffsetY, checkIntersection } from "./maths.js";
 //Handles the creation, deletion, and editing of notes.
 
@@ -65,6 +65,12 @@ export function createNote(defaultText, stateVars, noteObject){
     //Set the text content if possible
     if(noteObject && noteObject.text){
         noteText.textContent = noteObject.text;
+    }
+
+    //Set the colour if an object was passed with a defined colour
+    if(noteObject && noteObject.colour){
+        newNote.style.backgroundColor = noteObject.colour;
+        newNote.setAttribute('colour', noteObject.colour);
     }
 
     //reposition the note to the stored X and Y coordinates
@@ -183,6 +189,10 @@ function appendDeleteButton(item){
     //Logic for the delete note button
     deleteButton.setAttribute('class', 'deleteButton');
     deleteButton.addEventListener('click', event => {
+
+        //Prevents a potential string connection attempt when the delete button is clicked
+        event.stopPropagation();
+        
         deleteNote(item);
     });
 
@@ -248,9 +258,13 @@ function appendConnectButton(item, stateVars){
             return;
         }
 
-        //If connectStart is null, store the note in that variable.
+        //If connectStart is null, store the note in that variable and create the temporary guideline string.
         if(stateVars.connectStart == null){
             stateVars.connectStart = item;
+
+            //Create the gudeline string
+            stateVars.guideline = makeTempString(stateVars, (parseFloat(item.getAttribute('data-x')) + item.offsetWidth/2), (parseFloat(item.getAttribute('data-y')) + item.offsetHeight/2));
+            stateVars.guideline.classList.add('string');
         }
     }
 
@@ -267,6 +281,10 @@ function appendConnectButton(item, stateVars){
 
         stateVars.connectEnd = item;
         makeString(stateVars);
+
+        //Remove and set the guideline to null
+        stateVars.guideline.remove();
+        stateVars.guideline = null;
     }
 
     //Append button
@@ -277,6 +295,13 @@ function appendConnectButton(item, stateVars){
 export function openEditModal(note, stateVars){
     stateVars.editOverlay.showModal();
     stateVars.currentEditedNote = note;
+
+    //If the note has a set colour, ensure the corresponding colour radio option is checked, otherwise default to yellow
+    if(stateVars.currentEditedNote.getAttribute('colour')){
+        document.querySelector(`input[name="noteColour"][value="${stateVars.currentEditedNote.getAttribute('colour')}"]`).checked = true;
+    } else{
+        document.querySelector('input[name="noteColour"][value="#fff200"]').checked = true;
+    }
 }
 
 //This closes the modal, makes it hidden again, and sets the currently edited note to null.
@@ -288,7 +313,13 @@ export function cancelEditNote(stateVars){
 
 //This closes the modal, makes it hidden again, applies the inputed text to the currently edited note, and sets the currently edited note back to null.
 export function applyEditNote(stateVars){
+    const selectedColour = document.querySelector('input[name="noteColour"]:checked'); //Retrieves the value of the checked colour when applied
+
+    //Alter properties of the note currently being edited based on user selections in the edit modal
+    stateVars.currentEditedNote.style.backgroundColor = selectedColour.value;
+    stateVars.currentEditedNote.setAttribute('colour', selectedColour.value);
     stateVars.currentEditedNote.querySelector('p').textContent = document.getElementById('modalTextInput').value;
+    stateVars.currentEditedNote.style
     stateVars.currentEditedNote = null;
     stateVars.editOverlay.close();
     stateVars.editOverlay.classList.add("hidden");

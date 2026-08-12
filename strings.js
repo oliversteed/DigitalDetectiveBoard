@@ -64,6 +64,20 @@ export function makeString(stateVars, loadedString){
     stateVars.connectEnd = null;
 }
 
+//Creates a new temporary string with the same start and end point at the passed coordinates
+export function makeTempString(stateVars, posx, posy){
+    //Create a new line with the same start and end point initially
+    const tempString = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    tempString.setAttribute('x1', posx);
+    tempString.setAttribute('y1', posy);
+    tempString.setAttribute('x2', posx);
+    tempString.setAttribute('y2', posy);
+
+    stateVars.stringLayer.appendChild(tempString);
+
+    return tempString;
+}
+
 //Passes a moved item, such as a note, and updates all strings connected to that item.
 export function updateStrings(movedItem){
     const posX = parseFloat(movedItem.getAttribute('data-x')) + (movedItem.offsetWidth/2);

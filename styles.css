@@ -8,6 +8,59 @@ body{
     );
 }
 
+.modalColourPicker{
+    display: grid;
+    grid-template-columns: repeat(3, auto);
+    gap: 20px;
+    justify-content: center;
+    margin: auto 0;
+}
+
+.modalColourPicker input{
+    appearance: none;
+
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid;
+    border-color: rgba(0, 0, 0, 0.2);
+
+    transition: transform 0.2s ease;
+}
+
+.modalColourPicker input:hover{
+    transform: scale(1.1);
+}
+
+.modalColourPicker input:checked{
+    border-color: black;
+}
+
+#noteYellow{
+    background-color: rgb(255, 242, 0);
+}
+
+#noteBlue{
+    background-color: cyan;
+}
+
+#noteRed{
+    background-color: rgb(255, 128, 128);
+}
+
+#noteGreen{
+    background-color: rgb(107, 225, 107);
+}
+
+#notePink{
+    background-color: pink;
+}
+
+#noteWhite{
+    background-color: white;
+}
+
 .note{
     background-color: rgb(255, 242, 0);
     color: rgb(0, 0, 0);
@@ -44,7 +97,7 @@ body{
     border-style: solid;
 }
 
-.image img{
+.image img:not(.smallIcon){
     width: 100%;
     height: 100%;
     object-fit: contain;
@@ -112,14 +165,13 @@ body{
 }
 
 .smallIcon{
-    height: 70%;
-    width: 70%;
-    margin-top: 10%;
+    height: 80%;
+    width: 80%;
 }
 
 .smallIconConnect{
-    height: 80%;
-    width: 80%;
+    height: 100%;
+    width: 100%;
     margin-top: 10%;
 }
 
@@ -137,6 +189,9 @@ body{
     border-style: solid;
     padding: 0;
     background-color: red;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
     opacity: 0;
     transition: opacity 0.3s ease-in-out;
@@ -157,6 +212,9 @@ body{
     border-style: solid;
     padding: 0;
     background-color: orange;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
     opacity: 0;
     transition: opacity 0.3s ease-in-out;
@@ -176,6 +234,9 @@ body{
     border-width: 3px;
     border-style: solid;
     padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
     opacity: 0;
     transition: opacity 0.3s ease-in-out;
@@ -239,6 +300,31 @@ body{
     cursor: crosshair !important;
 }
 
+.modalButton{
+    width: 60px;
+    height: 60px;
+    border-radius: 25px;
+    border: 3px solid black;
+    cursor: pointer;
+
+    display: inline-flex;
+    align-items: center;
+}
+
+#cancelNoteEditButton, #cancelClear{
+    background-color: rgb(255, 128, 128);
+}
+
+#applyNoteEditButton, #acceptClear{
+    background-color: rgb(107, 225, 107);
+}
+
+.modalButton svg{
+    width: 40px;
+    height: 40px;
+    pointer-events: none;
+}
+
 #corkboard{
     position: relative;
     height: 5000px;
@@ -289,7 +375,7 @@ body{
 }
 
 /* Modal backdrop colour */
-#modalOverlay{
+#modalOverlay, #clearConfirmation{
     background-color: rgba(0, 0, 0, 0.5);
     position: fixed;
     top: 0;
@@ -301,7 +387,7 @@ body{
     align-items: center;
 }
 
-#editNoteBox{
+#editNoteBox, #confirmationNoteBox{
     background-color: rgb(255, 252, 190);
     color: rgb(0, 0, 0);
     text-align: center;
@@ -310,19 +396,20 @@ body{
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    gap: 20px;
     width: 30vw;
-    aspect-ratio: 1/1;
+    min-width: 320px;
+    height: auto;
     border-color: black;
     border-width: 3px;
     border-style: solid;
     overflow: visible;
-    padding: 5px;
+    padding: 20px;
 }
 
 #modalTextInput{
     width: 90%;
-    height: 90%;
+    height: 100px;
     resize: none;
     margin: 10px;
     border: 2px solid black;

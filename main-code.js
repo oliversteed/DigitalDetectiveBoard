@@ -1,6 +1,6 @@
 //Import other JS files
 import {checkIntersection, getDataX, getDataY, calculateOffsetX, calculateOffsetY} from "./maths.js";
-import { makeString, updateStrings, removeAttachedStrings } from "./strings.js";
+import { makeString, updateStrings, removeAttachedStrings, makeTempString } from "./strings.js";
 import { toggleCut } from "./toggles.js";
 import { createNote, createImage, cancelEditNote, applyEditNote, uploadImage, clearBoard } from "./itemHandling.js";
 import { zoomHandler } from "./zoom.js";
@@ -15,10 +15,12 @@ const stateVars = {
     connectEnd: null,
     itemIDTracker: 1,
     editOverlay: null,
+    confirmOverlay: null,
     corkboard: null,
     zoomSpace: null,
     stringLayer: null,
     cutLine: null,
+    guideline: null,
     clipboard: null,
     zoomLevel: 1,
     keyMoveSpeed: 20,
@@ -30,6 +32,7 @@ const stateVars = {
 document.addEventListener('DOMContentLoaded', () =>{
     //retrieve and store necessary elements to add listeners to
     stateVars.editOverlay = document.getElementById('modalOverlay');
+    stateVars.confirmOverlay = document.getElementById('clearConfirmation');
     stateVars.corkboard = document.getElementById('corkboard');
     stateVars.stringLayer = document.getElementById('string');
     stateVars.zoomSpace = document.getElementById('zoomSpace');
@@ -42,6 +45,8 @@ document.addEventListener('DOMContentLoaded', () =>{
     const cutButton = document.getElementById('cutButtonID');
     const cancelEditButton = document.getElementById('cancelNoteEditButton');
     const applyEditButton = document.getElementById('applyNoteEditButton');
+    const confirmClearButton = document.getElementById('acceptClear');
+    const cancelClearButton = document.getElementById('cancelClear');
 
     //Ensure Interact listeners are set after DOM has fully loaded
     setInteractListeners();
@@ -51,10 +56,12 @@ document.addEventListener('DOMContentLoaded', () =>{
     uploadImageButton.addEventListener('click', () => document.getElementById("uploadedImage").click());
     saveBoardButton.addEventListener('click', () => saveBoard(stateVars));
     loadBoardButton.addEventListener('click', () => document.getElementById("loadedBoard").click())
-    clearButton.addEventListener('click', () => clearBoard(stateVars));
+    clearButton.addEventListener('click', () => clearConfirmation());
     cutButton.addEventListener('click', () => toggleCut(stateVars));
     cancelEditButton.addEventListener('click', () => cancelEditNote(stateVars));
     applyEditButton.addEventListener('click', () => applyEditNote(stateVars));
+    confirmClearButton.addEventListener('click', () => confirmClear());
+    cancelClearButton.addEventListener('click', () => cancelClear());
 
     //Add event listener to the hidden image input to check when a new images is being uploaded
     document.getElementById("uploadedImage").addEventListener('change', () => uploadImage(event, stateVars));
@@ -114,38 +121,74 @@ document.addEventListener('DOMContentLoaded', () =>{
     stateVars.corkboard.addEventListener('mousedown', (event) => {
         if(stateVars.cutToggle == false) return;
 
+        //Clean up any previously drawn cut lines that may have lingered due to moving the mouse outside the window
+        document.querySelectorAll('.cutLine').forEach(line => {
+            line.remove();
+        })
+
+        //make notes transparent to make string connections easier to see
+        const boardNotes = document.querySelectorAll('.note, .image');
+        boardNotes.forEach(item => {
+            item.style.opacity = "0.5";
+        })
+
         //get coordinates of where the mouse click occured.
         const mousePosX = (event.clientX - stateVars.corkboard.getBoundingClientRect().left)/stateVars.zoomLevel;
         const mousePosY = (event.clientY - stateVars.corkboard.getBoundingClientRect().top)/stateVars.zoomLevel;
 
-        //Create a new line with the same start and end point initially
-        stateVars.cutLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
-        stateVars.cutLine.setAttribute('x1', mousePosX);
-        stateVars.cutLine.setAttribute('y1', mousePosY);
-        stateVars.cutLine.setAttribute('x2', mousePosX);
-        stateVars.cutLine.setAttribute('y2', mousePosY);
+        //Make a temporary string at the point of the mouse click
+        stateVars.cutLine = makeTempString(stateVars, mousePosX, mousePosY);
 
         //Set the styling for the line
         stateVars.cutLine.classList.add('cutLine');
-
-        stateVars.stringLayer.appendChild(stateVars.cutLine);
     });
+
+    //Add event listener for right clicking to cancel a current connection
+    window.addEventListener('contextmenu', (event) => {
+
+        //Only proceed if the guideline is currently not null
+        if(!(stateVars.guideline == null)){
+
+            //Prevent the context menu from opening
+            event.preventDefault();
+
+            //Remove the guideline and set the guideline variable back to null
+            stateVars.guideline.remove();
+            stateVars.guideline = null;
+
+            //Set the connectStart variable to null to prevent another click from making an unwanted string
+            stateVars.connectStart = null;
+        }
+    })
     
+    //Add event listener for updating temporary strings
     window.addEventListener('mousemove', (event) => {
-        if(stateVars.cutToggle == false) return;
-        if(stateVars.cutLine == null) return;
 
         //Get new mouse coordinates as the mouse is moved
         const mousePosX = (event.clientX - stateVars.corkboard.getBoundingClientRect().left)/stateVars.zoomLevel;
         const mousePosY = (event.clientY - stateVars.corkboard.getBoundingClientRect().top)/stateVars.zoomLevel;
 
-        //Set new coordinates for the end of the line, moving it with the mouse.
-        stateVars.cutLine.setAttribute('x2', mousePosX);
-        stateVars.cutLine.setAttribute('y2', mousePosY);
+        if((stateVars.cutToggle == true) && !(stateVars.cutLine == null)){
+            //Set new coordinates for the end of the line, moving it with the mouse.
+            stateVars.cutLine.setAttribute('x2', mousePosX);
+            stateVars.cutLine.setAttribute('y2', mousePosY);
+        }
+
+        if(!(stateVars.guideline == null)){
+            //Set new coordinates for the end of the guideline, moving it with the mouse.
+            stateVars.guideline.setAttribute('x2', mousePosX);
+            stateVars.guideline.setAttribute('y2', mousePosY);
+        }
     });
 
     stateVars.corkboard.addEventListener('mouseup', (event) => {
         if(stateVars.cutToggle == false) return;
+
+        //Return note opacity to normal
+        const boardNotes = document.querySelectorAll('.note, .image');
+        boardNotes.forEach(item => {
+            item.style.opacity = "1";
+        })
 
         //Get the start and end positions of the final cut line.
         const cutStartX = parseFloat(stateVars.cutLine.getAttribute('x1'));
@@ -373,11 +416,13 @@ function arrowKeyMovement(event){
     let focusItem = document.activeElement;
 
     var moveSpeed = stateVars.keyMoveSpeed;
+    var moveCorkboard = false;
 
     //If a draggable element is not focused, move the corkboard instead. Make the moveSpeed var negative to make the corkboard move intuitively.
-    if(!document.activeElement.classList.contains('draggable')){
+    if(!document.activeElement.classList.contains('draggable') && !document.activeElement.classList.contains('image')){
         focusItem = stateVars.corkboard;
         moveSpeed = moveSpeed * -1;
+        moveCorkboard = true;
     }
 
     //Get focused item's current coordinates
@@ -402,10 +447,18 @@ function arrowKeyMovement(event){
             break;
     }
 
+    //Prevent items going out of bounds
+    if((x < 0) || ((x + focusItem.offsetWidth)  > 5000) || (y < 0) || ((y + focusItem.offsetHeight) > 5000)) return;
+
     focusItem.style.transform = `translate(${x}px, ${y}px)`;
 
     focusItem.setAttribute('data-x', x);
     focusItem.setAttribute('data-y', y);
+
+    //If the item being moved is not the corkboard, update the position of any attached strings
+    if(!moveCorkboard){
+        updateStrings(focusItem);
+    }
     
 }
 
@@ -432,4 +485,20 @@ function resizeListener(event){
 
     //update any attached strings
     updateStrings(event.target);
+}
+
+function clearConfirmation(){
+    stateVars.confirmOverlay.classList.remove('hidden');
+    stateVars.confirmOverlay.showModal();
+}
+
+function confirmClear(){
+    clearBoard(stateVars);
+    stateVars.confirmOverlay.classList.add('hidden');
+    stateVars.confirmOverlay.close();
+}
+
+function cancelClear(){
+    stateVars.confirmOverlay.classList.add('hidden');
+    stateVars.confirmOverlay.close();
 }

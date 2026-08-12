@@ -138,6 +138,7 @@ export function saveNote(note){
         y: parseFloat(note.getAttribute('data-y')),
         width: note.offsetWidth,
         height: note.offsetHeight,
+        colour: note.getAttribute('colour'),
     }
 
     return savedObj;

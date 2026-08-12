@@ -36,11 +36,29 @@
             </div>
             <div class="modalColourSection">
                 <label class="modalColourSelectorLabel" for="modalColourSelector">Select Note Colour</label>
-                <div class="modalColourPicker" id="modalColourSelector"></div>
+                <div class="modalColourPicker" id="modalColourSelector">
+                    <input type="radio" id="noteYellow" name="noteColour" value="#fff200" checked>
+                    <input type="radio" id="noteBlue" name="noteColour" value="#00ffff">
+                    <input type="radio" id="noteRed" name="noteColour" value="#ff8080">
+                    <input type="radio" id="noteGreen" name="noteColour" value="#6be16b">
+                    <input type="radio" id="notePink" name="noteColour" value="#ffc0cb">
+                    <input type="radio" id="noteWhite" name="noteColour" value="#ffffff">
+                </div>
             </div>
             <div>
-                <button id="cancelNoteEditButton">Cancel</button>
-                <button id="applyNoteEditButton">Apply</button>
+                <button class="modalButton" id="cancelNoteEditButton"><img class="icon" src="Resources/x-lg.svg"></button>
+                <button class="modalButton" id="applyNoteEditButton"><img class="icon" src="Resources/check.svg"></button>
+            </div>
+        </span>
+    </dialog>
+    <dialog id="clearConfirmation" class="hidden">
+        <span id="confirmationNoteBox" role="dialog" aria-label="Clear board confirmation window" aria-modal="true">
+            <div class="clearBoardConfirmationSection">
+                <label class="confirmClearLabel" for="confirmClear">Are you sure you want to clear the board?</label>
+                <div id="confirmClear">
+                    <button class="modalButton" id="cancelClear"><img class="icon" src="Resources/x-lg.svg"></button>
+                    <button class="modalButton" id="acceptClear"><img class="icon" src="Resources/check.svg"></button>
+                </div>
             </div>
         </span>
     </dialog>
