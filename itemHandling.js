@@ -19,8 +19,8 @@ export function createNote(defaultText, stateVars, noteObject){
 
     //Create and add all relevant buttons
     appendDeleteButton(newNote, stateVars);
-    appendEditButton(newNote, stateVars);
     appendConnectButton(newNote, stateVars);
+    appendEditButton(newNote, stateVars);
 
     //Set note HTML attributes
     newNote.setAttribute('class', 'draggable note'); //set note to have draggable and note classes

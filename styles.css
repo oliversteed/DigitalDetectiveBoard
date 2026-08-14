@@ -237,6 +237,7 @@ body{
     display: flex;
     align-items: center;
     justify-content: center;
+    background-color: rgb(220, 217, 217);
 
     opacity: 0;
     transition: opacity 0.3s ease-in-out;
@@ -260,9 +261,17 @@ body{
     background-color: rgb(190, 0, 0);
 }
 
+.deleteButton:hover{
+    cursor: pointer;
+}
+
 .draggable:hover .editButton,
 .draggable:focus-within .editButton{
     opacity: 1;
+}
+
+.editButton:hover{
+    cursor: pointer;
 }
 
 .editButton:hover,
@@ -275,6 +284,15 @@ body{
 .image:hover .connectButton,
 .image:focus-within .connectButton{
     opacity: 1;
+}
+
+.connectButton:hover,
+.connectButton:focus-within{
+    background-color: rgb(192, 191, 191);
+}
+
+.connectButton:hover{
+    cursor: pointer;
 }
 
 /* for initially hidden content */
