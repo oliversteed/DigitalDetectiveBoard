@@ -269,6 +269,10 @@ document.addEventListener('DOMContentLoaded', () =>{
     //Autosave when interact.js interactions end for dragging and resizing.
     window.addEventListener('dragend', autoSave);
     window.addEventListener('resizeend', autoSave);
+
+    //Set the data-x and data-y for the corkboard on initialisation to allow keyboard movement to work without needing to drag the corkboard at least once to force the variables to be set.
+    stateVars.corkboard.setAttribute('data-x', 0);
+    stateVars.corkboard.setAttribute('data-y', 0);
 })
 
 //Debounce function sets a 500 ms delay before initiating the passed function
@@ -448,7 +452,7 @@ function arrowKeyMovement(event){
     }
 
     //Prevent items going out of bounds
-    if((x < 0) || ((x + focusItem.offsetWidth)  > 5000) || (y < 0) || ((y + focusItem.offsetHeight) > 5000)) return;
+    if((focusItem.classList.contains('note') || focusItem.classList.contains('image')) && ((x < 0) || ((x + focusItem.offsetWidth)  > 5000) || (y < 0) || ((y + focusItem.offsetHeight) > 5000))) return;
 
     focusItem.style.transform = `translate(${x}px, ${y}px)`;
 
